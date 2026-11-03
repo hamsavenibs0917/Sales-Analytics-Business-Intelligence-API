@@ -39,11 +39,18 @@ def create_app(config_name=None):
     # Base & Health Check routes
     @app.route("/", methods=["GET"])
     def index():
+        from flask import render_template, request
+        # If user visits in a web browser, serve the interactive BI Dashboard
+        accept_header = request.headers.get("Accept", "")
+        if "text/html" in accept_header:
+            return render_template("dashboard.html")
+
         return jsonify({
             "service": "Sales Analytics & Business Intelligence REST API",
             "version": "1.0.0",
             "status": "online",
             "environment": config_name,
+            "dashboard": "/dashboard",
             "documentation": "/api/v1/docs",
             "endpoints": {
                 "auth": "/api/v1/auth",
@@ -54,6 +61,12 @@ def create_app(config_name=None):
                 "products": "/api/v1/products"
             }
         }), 200
+
+    @app.route("/dashboard", methods=["GET"])
+    def dashboard():
+        """Direct website route for the Business Intelligence Dashboard."""
+        from flask import render_template
+        return render_template("dashboard.html")
 
     @app.route("/health", methods=["GET"])
     def health():

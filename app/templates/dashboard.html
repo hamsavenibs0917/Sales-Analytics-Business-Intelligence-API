@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales Analytics & Business Intelligence Dashboard</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- FontAwesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#1e1b4b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
+
+  <!-- Top Navigation Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white shadow-md">
+          <i class="fa-solid fa-chart-line text-lg"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-slate-900 leading-tight">SalesBI Analytics</h1>
+          <p class="text-xs text-slate-500">Executive Business Intelligence Suite</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <span id="api-status" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+          <span class="w-2 h-2 mr-1.5 rounded-full bg-emerald-500 animate-pulse"></span> API Connected
+        </span>
+
+        <a href="/api/v1/docs" target="_blank" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
+          <i class="fa-solid fa-book-open mr-1.5"></i> Swagger API Docs
+        </a>
+
+        <button onclick="openUploadModal()" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-sm transition">
+          <i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> Ingest Dataset
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+    <!-- Filters & Action Bar -->
+    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+      <div class="flex flex-wrap items-center gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Date Range</label>
+          <div class="flex items-center space-x-2">
+            <input type="date" id="start-date" class="border border-slate-300 rounded-lg text-xs px-2.5 py-1.5 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <span class="text-slate-400 text-xs">to</span>
+            <input type="date" id="end-date" class="border border-slate-300 rounded-lg text-xs px-2.5 py-1.5 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Region</label>
+          <select id="region-filter" class="border border-slate-300 rounded-lg text-xs px-2.5 py-1.5 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            <option value="">All Regions</option>
+            <option value="North">North</option>
+            <option value="South">South</option>
+            <option value="East">East</option>
+            <option value="West">West</option>
+            <option value="Central">Central</option>
+            <option value="International">International</option>
+          </select>
+        </div>
+
+        <div class="pt-5">
+          <button onclick="loadDashboardData()" class="px-3.5 py-1.5 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition shadow-sm">
+            <i class="fa-solid fa-filter mr-1"></i> Apply Filters
+          </button>
+          <button onclick="resetFilters()" class="px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 transition">
+            Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- Export Buttons -->
+      <div class="flex items-center space-x-2">
+        <button onclick="exportReport('excel')" class="inline-flex items-center px-3 py-1.5 border border-emerald-600 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg text-xs font-semibold transition">
+          <i class="fa-solid fa-file-excel mr-1.5 text-emerald-600"></i> Export Excel (.xlsx)
+        </button>
+        <button onclick="exportReport('csv')" class="inline-flex items-center px-3 py-1.5 border border-blue-600 text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg text-xs font-semibold transition">
+          <i class="fa-solid fa-file-csv mr-1.5 text-blue-600"></i> Export CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI Metric Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+      <!-- Total Revenue -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-medium text-slate-500 uppercase">Gross Revenue</span>
+          <span class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm">
+            <i class="fa-solid fa-dollar-sign"></i>
+          </span>
+        </div>
+        <div id="kpi-revenue" class="text-xl font-bold text-slate-900">$0.00</div>
+        <span class="text-xs text-emerald-600 font-semibold"><i class="fa-solid fa-arrow-trend-up mr-1"></i>Total Sales Volume</span>
+      </div>
+
+      <!-- Net Profit -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-medium text-slate-500 uppercase">Net Profit</span>
+          <span class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm">
+            <i class="fa-solid fa-sack-dollar"></i>
+          </span>
+        </div>
+        <div id="kpi-profit" class="text-xl font-bold text-slate-900">$0.00</div>
+        <span class="text-xs text-indigo-600 font-semibold">After COGS Deductions</span>
+      </div>
+
+      <!-- Profit Margin % -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-medium text-slate-500 uppercase">Gross Margin</span>
+          <span class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-sm">
+            <i class="fa-solid fa-percent"></i>
+          </span>
+        </div>
+        <div id="kpi-margin" class="text-xl font-bold text-slate-900">0.0%</div>
+        <span class="text-xs text-purple-600 font-semibold">Profitability Ratio</span>
+      </div>
+
+      <!-- Total Units Sold -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-medium text-slate-500 uppercase">Units Sold</span>
+          <span class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm">
+            <i class="fa-solid fa-boxes-stacked"></i>
+          </span>
+        </div>
+        <div id="kpi-units" class="text-xl font-bold text-slate-900">0</div>
+        <span class="text-xs text-amber-600 font-semibold">Items Shipped</span>
+      </div>
+
+      <!-- Total Transactions -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-medium text-slate-500 uppercase">Orders</span>
+          <span class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-sm">
+            <i class="fa-solid fa-receipt"></i>
+          </span>
+        </div>
+        <div id="kpi-orders" class="text-xl font-bold text-slate-900">0</div>
+        <span class="text-xs text-sky-600 font-semibold">Transactions</span>
+      </div>
+
+      <!-- Average Order Value (AOV) -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-medium text-slate-500 uppercase">Avg Order (AOV)</span>
+          <span class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center text-sm">
+            <i class="fa-solid fa-cart-shopping"></i>
+          </span>
+        </div>
+        <div id="kpi-aov" class="text-xl font-bold text-slate-900">$0.00</div>
+        <span class="text-xs text-rose-600 font-semibold">Avg Basket Size</span>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Monthly Revenue & Profit Trends (2 cols) -->
+      <div class="lg:col-span-2 bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-sm font-bold text-slate-900">Monthly Revenue & Profit Trajectory</h2>
+            <p class="text-xs text-slate-500">Month-over-Month (MoM) performance calculated via Pandas</p>
+          </div>
+          <span class="text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md font-medium">Time-Series</span>
+        </div>
+        <div class="h-72">
+          <canvas id="monthlyTrendChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Regional Share Donut (1 col) -->
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-sm font-bold text-slate-900">Regional Performance</h2>
+            <p class="text-xs text-slate-500">Revenue contribution % by territory</p>
+          </div>
+        </div>
+        <div class="flex-1 flex items-center justify-center h-64">
+          <canvas id="regionalChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Second Row: Top Products & Summary Stats -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Top Products (2 cols) -->
+      <div class="lg:col-span-2 bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-sm font-bold text-slate-900">Top-Selling Products</h2>
+            <p class="text-xs text-slate-500">Ranked by gross sales volume and profit margin</p>
+          </div>
+        </div>
+        <div class="h-64">
+          <canvas id="productsChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Statistical Distribution Card (NumPy Powered) -->
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <h2 class="text-sm font-bold text-slate-900 mb-1">NumPy Statistical Insights</h2>
+        <p class="text-xs text-slate-500 mb-4">Transaction size distribution metrics</p>
+        
+        <div class="space-y-3">
+          <div class="flex justify-between items-center text-xs py-1.5 border-b border-slate-100">
+            <span class="text-slate-600">Mean Transaction:</span>
+            <span id="stat-mean" class="font-bold text-slate-900">$0.00</span>
+          </div>
+          <div class="flex justify-between items-center text-xs py-1.5 border-b border-slate-100">
+            <span class="text-slate-600">Median Transaction:</span>
+            <span id="stat-median" class="font-bold text-slate-900">$0.00</span>
+          </div>
+          <div class="flex justify-between items-center text-xs py-1.5 border-b border-slate-100">
+            <span class="text-slate-600">Standard Deviation:</span>
+            <span id="stat-std" class="font-bold text-slate-900">$0.00</span>
+          </div>
+          <div class="flex justify-between items-center text-xs py-1.5 border-b border-slate-100">
+            <span class="text-slate-600">25th Percentile (Q1):</span>
+            <span id="stat-q25" class="font-bold text-slate-900">$0.00</span>
+          </div>
+          <div class="flex justify-between items-center text-xs py-1.5 border-b border-slate-100">
+            <span class="text-slate-600">75th Percentile (Q3):</span>
+            <span id="stat-q75" class="font-bold text-slate-900">$0.00</span>
+          </div>
+          <div class="flex justify-between items-center text-xs py-1.5">
+            <span class="text-slate-600">Interquartile Range (IQR):</span>
+            <span id="stat-iqr" class="font-bold text-indigo-600">$0.00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Sales Table -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="p-4 border-b border-slate-200 flex items-center justify-between">
+        <div>
+          <h2 class="text-sm font-bold text-slate-900">Recent Transactions</h2>
+          <p class="text-xs text-slate-500">Live sales ledger records</p>
+        </div>
+        <span class="text-xs text-slate-500 font-medium" id="table-total-count">Showing 10 records</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-700">
+          <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200">
+            <tr>
+              <th class="px-4 py-3">Txn ID</th>
+              <th class="px-4 py-3">Date</th>
+              <th class="px-4 py-3">Customer</th>
+              <th class="px-4 py-3">Product</th>
+              <th class="px-4 py-3">Region</th>
+              <th class="px-4 py-3 text-right">Qty</th>
+              <th class="px-4 py-3 text-right">Revenue</th>
+              <th class="px-4 py-3 text-right">Profit</th>
+              <th class="px-4 py-3 text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody id="sales-table-body" class="divide-y divide-slate-100">
+            <tr>
+              <td colspan="9" class="px-4 py-8 text-center text-slate-400">Loading transactions...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Upload Modal -->
+  <div id="upload-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-900">Ingest Sales Dataset</h3>
+        <button onclick="closeUploadModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <p class="text-xs text-slate-500">
+        Upload a <strong>CSV (.csv)</strong> or <strong>Excel (.xlsx)</strong> dataset. The engine will clean data types, normalize headers, and skip duplicates automatically.
+      </p>
+
+      <form id="upload-form" onsubmit="handleUploadSubmit(event)" class="space-y-4">
+        <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-brand-500 transition cursor-pointer" onclick="document.getElementById('file-input').click()">
+          <i class="fa-solid fa-cloud-arrow-up text-3xl text-brand-600 mb-2"></i>
+          <p id="file-label" class="text-xs font-semibold text-slate-700">Click to browse or drop CSV/Excel here</p>
+          <p class="text-[10px] text-slate-400 mt-1">Supports sample_sales.csv and sample_sales.xlsx</p>
+          <input type="file" id="file-input" name="file" accept=".csv, .xlsx, .xls" class="hidden" onchange="updateFileLabel()">
+        </div>
+
+        <div id="upload-result" class="text-xs p-3 rounded-lg hidden"></div>
+
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" onclick="closeUploadModal()" class="px-3.5 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 rounded-lg">Cancel</button>
+          <button type="submit" id="upload-btn" class="px-4 py-1.5 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition">Upload & Process</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Client-side Business Intelligence Application Logic -->
+  <script>
+    let authToken = localStorage.getItem("access_token") || null;
+    let monthlyChart = null;
+    let regionalChart = null;
+    let productsChart = null;
+
+    // 1. Authenticate with backend API automatically
+    async function ensureAuth() {
+      if (!authToken) {
+        try {
+          const res = await fetch("/api/v1/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: "admin@company.com", password: "AdminPass123!" })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            authToken = data.access_token;
+            localStorage.setItem("access_token", authToken);
+          }
+        } catch (e) {
+          console.warn("Could not auto-login:", e);
+        }
+      }
+    }
+
+    function authHeaders() {
+      return authToken ? { "Authorization": `Bearer ${authToken}` } : {};
+    }
+
+    // 2. Fetch and render KPIs
+    async function loadKPIs(startDate, endDate, region) {
+      let url = `/api/v1/analytics/summary?`;
+      if (startDate) url += `start_date=${startDate}&`;
+      if (endDate) url += `end_date=${endDate}&`;
+      if (region) url += `region=${encodeURIComponent(region)}&`;
+
+      const res = await fetch(url, { headers: authHeaders() });
+      if (res.ok) {
+        const json = await res.json();
+        const d = json.data;
+        document.getElementById("kpi-revenue").innerText = `$${d.total_revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+        document.getElementById("kpi-profit").innerText = `$${d.total_profit.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+        document.getElementById("kpi-margin").innerText = `${d.gross_profit_margin_percent.toFixed(1)}%`;
+        document.getElementById("kpi-units").innerText = d.total_units_sold.toLocaleString();
+        document.getElementById("kpi-orders").innerText = d.total_orders.toLocaleString();
+        document.getElementById("kpi-aov").innerText = `$${d.average_order_value.toFixed(2)}`;
+      }
+    }
+
+    // 3. Monthly Trends Chart (MoM %)
+    async function loadMonthlyTrends(startDate, endDate) {
+      let url = `/api/v1/analytics/trends/monthly?`;
+      if (startDate) url += `start_date=${startDate}&`;
+      if (endDate) url += `end_date=${endDate}&`;
+
+      const res = await fetch(url, { headers: authHeaders() });
+      if (!res.ok) return;
+      const json = await res.json();
+      const records = json.data;
+
+      const labels = records.map(r => r.period);
+      const revenues = records.map(r => r.revenue);
+      const profits = records.map(r => r.profit);
+
+      const ctx = document.getElementById("monthlyTrendChart").getContext("2d");
+      if (monthlyChart) monthlyChart.destroy();
+
+      monthlyChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "Revenue ($)",
+              data: revenues,
+              backgroundColor: "rgba(99, 102, 241, 0.8)",
+              borderRadius: 6,
+            },
+            {
+              label: "Profit ($)",
+              data: profits,
+              backgroundColor: "rgba(16, 185, 129, 0.8)",
+              borderRadius: 6,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: "top", labels: { boxWidth: 12, font: { size: 11 } } },
+            tooltip: {
+              callbacks: {
+                afterLabel: function(ctx) {
+                  const idx = ctx.dataIndex;
+                  return `MoM Growth: ${records[idx].mom_revenue_growth_percent}%`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: { grid: { color: "#f1f5f9" }, ticks: { font: { size: 10 } } },
+            x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+          }
+        }
+      });
+    }
+
+    // 4. Regional Share Donut Chart
+    async function loadRegionalShare(startDate, endDate) {
+      let url = `/api/v1/analytics/regions?`;
+      if (startDate) url += `start_date=${startDate}&`;
+      if (endDate) url += `end_date=${endDate}&`;
+
+      const res = await fetch(url, { headers: authHeaders() });
+      if (!res.ok) return;
+      const json = await res.json();
+      const regions = json.data;
+
+      const labels = regions.map(r => r.region);
+      const values = regions.map(r => r.total_revenue);
+
+      const ctx = document.getElementById("regionalChart").getContext("2d");
+      if (regionalChart) regionalChart.destroy();
+
+      regionalChart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: labels,
+          datasets: [{
+            data: values,
+            backgroundColor: [
+              "#6366f1", "#10b981", "#f59e0b", "#38bdf8", "#ec4899", "#8b5cf6"
+            ],
+            borderWidth: 2,
+            borderColor: "#ffffff"
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: "bottom", labels: { boxWidth: 10, font: { size: 10 } } }
+          },
+          cutout: "70%"
+        }
+      });
+    }
+
+    // 5. Top Products Chart
+    async function loadTopProducts(startDate, endDate) {
+      let url = `/api/v1/analytics/products/top?limit=5&`;
+      if (startDate) url += `start_date=${startDate}&`;
+      if (endDate) url += `end_date=${endDate}&`;
+
+      const res = await fetch(url, { headers: authHeaders() });
+      if (!res.ok) return;
+      const json = await res.json();
+      const products = json.data;
+
+      const labels = products.map(p => p.name.length > 20 ? p.name.substring(0, 18) + '...' : p.name);
+      const revenues = products.map(p => p.total_revenue);
+
+      const ctx = document.getElementById("productsChart").getContext("2d");
+      if (productsChart) productsChart.destroy();
+
+      productsChart = new Chart(ctx, {
+        type: "bar",
+        indexAxis: "y",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: "Total Sales ($)",
+            data: revenues,
+            backgroundColor: "#4f46e5",
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: { grid: { color: "#f1f5f9" }, ticks: { font: { size: 10 } } },
+            y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+          }
+        }
+      });
+    }
+
+    // 6. NumPy Distribution Stats
+    async function loadNumPyStats(startDate, endDate, region) {
+      let url = `/api/v1/analytics/stats?`;
+      if (startDate) url += `start_date=${startDate}&`;
+      if (endDate) url += `end_date=${endDate}&`;
+      if (region) url += `region=${encodeURIComponent(region)}&`;
+
+      const res = await fetch(url, { headers: authHeaders() });
+      if (!res.ok) return;
+      const json = await res.json();
+      const s = json.data;
+
+      document.getElementById("stat-mean").innerText = `$${s.revenue.mean.toFixed(2)}`;
+      document.getElementById("stat-median").innerText = `$${s.revenue.median.toFixed(2)}`;
+      document.getElementById("stat-std").innerText = `$${s.revenue.std_dev.toFixed(2)}`;
+      document.getElementById("stat-q25").innerText = `$${s.revenue.q25.toFixed(2)}`;
+      document.getElementById("stat-q75").innerText = `$${s.revenue.q75.toFixed(2)}`;
+      document.getElementById("stat-iqr").innerText = `$${s.revenue.iqr.toFixed(2)}`;
+    }
+
+    // 7. Recent Transactions Table
+    async function loadTransactions(startDate, endDate, region) {
+      let url = `/api/v1/sales?per_page=10&`;
+      if (startDate) url += `start_date=${startDate}&`;
+      if (endDate) url += `end_date=${endDate}&`;
+      if (region) url += `region=${encodeURIComponent(region)}&`;
+
+      const res = await fetch(url, { headers: authHeaders() });
+      if (!res.ok) return;
+      const json = await res.json();
+      const sales = json.items;
+
+      document.getElementById("table-total-count").innerText = `Total Records: ${json.pagination.total_items}`;
+
+      const tbody = document.getElementById("sales-table-body");
+      if (sales.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-6 text-center text-slate-400">No records found matching filters.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = sales.map(s => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="px-4 py-2.5 font-mono font-medium text-slate-900">${s.transaction_id}</td>
+          <td class="px-4 py-2.5 text-slate-500">${s.sale_date}</td>
+          <td class="px-4 py-2.5 font-medium text-slate-800">${s.customer ? s.customer.name : 'Unknown'}</td>
+          <td class="px-4 py-2.5 text-slate-600">${s.product ? s.product.name : 'Unknown'}</td>
+          <td class="px-4 py-2.5"><span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-semibold">${s.region}</span></td>
+          <td class="px-4 py-2.5 text-right font-medium">${s.quantity}</td>
+          <td class="px-4 py-2.5 text-right font-bold text-slate-900">$${s.total_revenue.toFixed(2)}</td>
+          <td class="px-4 py-2.5 text-right font-semibold text-emerald-600">+$${s.total_profit.toFixed(2)}</td>
+          <td class="px-4 py-2.5 text-center">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${s.status === 'Completed' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+              ${s.status}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Master loader
+    async function loadDashboardData() {
+      const startDate = document.getElementById("start-date").value;
+      const endDate = document.getElementById("end-date").value;
+      const region = document.getElementById("region-filter").value;
+
+      await ensureAuth();
+      await Promise.all([
+        loadKPIs(startDate, endDate, region),
+        loadMonthlyTrends(startDate, endDate),
+        loadRegionalShare(startDate, endDate),
+        loadTopProducts(startDate, endDate),
+        loadNumPyStats(startDate, endDate, region),
+        loadTransactions(startDate, endDate, region),
+      ]);
+    }
+
+    function resetFilters() {
+      document.getElementById("start-date").value = "";
+      document.getElementById("end-date").value = "";
+      document.getElementById("region-filter").value = "";
+      loadDashboardData();
+    }
+
+    // Export handler
+    function exportReport(format) {
+      const startDate = document.getElementById("start-date").value;
+      const endDate = document.getElementById("end-date").value;
+      const region = document.getElementById("region-filter").value;
+
+      let url = format === 'excel' ? '/api/v1/reports/export/excel?' : '/api/v1/reports/export/csv?';
+      if (startDate) url += `start_date=${startDate}&`;
+      if (endDate) url += `end_date=${endDate}&`;
+      if (region) url += `region=${encodeURIComponent(region)}&`;
+
+      // Trigger download with auth header using fetch blob
+      fetch(url, { headers: authHeaders() })
+        .then(res => res.blob())
+        .then(blob => {
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = downloadUrl;
+          a.download = format === 'excel' ? `sales_bi_report_${Date.now()}.xlsx` : `sales_export_${Date.now()}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        })
+        .catch(err => alert("Error downloading report: " + err));
+    }
+
+    // Upload Modal functions
+    function openUploadModal() {
+      document.getElementById("upload-modal").classList.remove("hidden");
+    }
+
+    function closeUploadModal() {
+      document.getElementById("upload-modal").classList.add("hidden");
+      document.getElementById("upload-result").classList.add("hidden");
+    }
+
+    function updateFileLabel() {
+      const input = document.getElementById("file-input");
+      if (input.files.length > 0) {
+        document.getElementById("file-label").innerText = `Selected: ${input.files[0].name}`;
+      }
+    }
+
+    async function handleUploadSubmit(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById("file-input");
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert("Please choose a file to upload.");
+        return;
+      }
+
+      const btn = document.getElementById("upload-btn");
+      const resultBox = document.getElementById("upload-result");
+      btn.disabled = true;
+      btn.innerText = "Processing Dataset...";
+
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+
+      try {
+        const res = await fetch("/api/v1/sales/upload", {
+          method: "POST",
+          headers: authHeaders(),
+          body: formData
+        });
+        const json = await res.json();
+
+        resultBox.classList.remove("hidden");
+        if (res.ok) {
+          resultBox.className = "text-xs p-3 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 block";
+          resultBox.innerHTML = `
+            <strong>Success!</strong> ${json.message}<br>
+            • Inserted: ${json.statistics.inserted_records}<br>
+            • Duplicates Skipped: ${json.statistics.in_batch_duplicates_skipped + json.statistics.db_duplicates_skipped}<br>
+            • New Customers: ${json.statistics.new_customers_created || 0}<br>
+            • New Products: ${json.statistics.new_products_created || 0}
+          `;
+          setTimeout(() => {
+            loadDashboardData();
+            closeUploadModal();
+          }, 3000);
+        } else {
+          resultBox.className = "text-xs p-3 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 block";
+          resultBox.innerHTML = `<strong>Upload Failed:</strong> ${json.error ? json.error.message : 'Unknown error'}`;
+        }
+      } catch (err) {
+        resultBox.className = "text-xs p-3 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 block";
+        resultBox.innerText = `Network error: ${err.message}`;
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Upload & Process";
+      }
+    }
+
+    // Initialize on page load
+    window.addEventListener("DOMContentLoaded", () => {
+      loadDashboardData();
+    });
+  </script>
+</body>
+</html>
