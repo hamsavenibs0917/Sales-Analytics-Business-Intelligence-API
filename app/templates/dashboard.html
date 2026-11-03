@@ -309,39 +309,51 @@
             <!-- Floating Filter Popover Modal -->
             <div 
               id="filter-popover" 
-              class="hidden absolute right-0 top-12 w-80 sm:w-96 bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 p-5 z-40 space-y-4"
+              class="hidden absolute right-0 top-12 w-80 sm:w-96 bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 p-5 z-50 space-y-4"
             >
               <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-700">
-                <h4 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Filter Data Criteria</h4>
-                <button onclick="toggleFilterPopover()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+                <div class="flex items-center space-x-2">
+                  <i class="fa-solid fa-filter text-brand-600 text-xs"></i>
+                  <h4 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Filter Data Criteria</h4>
+                </div>
+                <button type="button" onclick="toggleFilterPopover()" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
               </div>
 
               <div class="space-y-3">
                 <div>
-                  <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Date Range</label>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400">Date Range</label>
+                    <div class="flex items-center space-x-1.5 text-[10px]">
+                      <button type="button" onclick="setQuickDateRange('all')" class="text-brand-600 dark:text-indigo-400 hover:underline font-semibold cursor-pointer">All Time</button>
+                      <span class="text-slate-300 dark:text-slate-600">•</span>
+                      <button type="button" onclick="setQuickDateRange('2025')" class="text-brand-600 dark:text-indigo-400 hover:underline font-semibold cursor-pointer">2025</button>
+                      <span class="text-slate-300 dark:text-slate-600">•</span>
+                      <button type="button" onclick="setQuickDateRange('2026')" class="text-brand-600 dark:text-indigo-400 hover:underline font-semibold cursor-pointer">2026</button>
+                    </div>
+                  </div>
                   <div class="grid grid-cols-2 gap-2">
-                    <input type="date" id="start-date" class="w-full text-xs p-2 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-500">
-                    <input type="date" id="end-date" class="w-full text-xs p-2 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                    <input type="date" id="start-date" onkeydown="if(event.key==='Enter') applyFilters()" class="w-full text-xs p-2 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                    <input type="date" id="end-date" onkeydown="if(event.key==='Enter') applyFilters()" class="w-full text-xs p-2 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-500">
                   </div>
                 </div>
 
                 <div>
                   <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Geographical Region</label>
-                  <select id="region-filter" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                  <select id="region-filter" onchange="applyFilters()" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-500 cursor-pointer">
                     <option value="">All Regions</option>
-                    <option value="North">North</option>
-                    <option value="South">South</option>
-                    <option value="East">East</option>
-                    <option value="West">West</option>
-                    <option value="Central">Central</option>
+                    <option value="North">North (America)</option>
+                    <option value="South">South (Atlanta)</option>
+                    <option value="East">East (Sweden / London)</option>
+                    <option value="West">West (Spain)</option>
+                    <option value="Central">Central (Germany)</option>
                     <option value="International">International</option>
                   </select>
                 </div>
               </div>
 
               <div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-700">
-                <button onclick="resetFilters()" class="text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-white">Reset All</button>
-                <button onclick="applyFilters()" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-md transition">Apply Filters</button>
+                <button type="button" onclick="resetFilters()" class="text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-white cursor-pointer">Reset All</button>
+                <button type="button" onclick="applyFilters()" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-md transition cursor-pointer">Apply Filters</button>
               </div>
             </div>
           </div>
@@ -952,6 +964,10 @@
       if (menu) menu.classList.toggle("hidden");
       const notifMenu = document.getElementById("notification-menu");
       if (notifMenu) notifMenu.classList.add("hidden");
+      const filterPop = document.getElementById("filter-popover");
+      if (filterPop) filterPop.classList.add("hidden");
+      const expDropdown = document.getElementById("export-dropdown");
+      if (expDropdown) expDropdown.classList.add("hidden");
     }
 
     function toggleNotificationMenu() {
@@ -959,6 +975,119 @@
       if (notifMenu) notifMenu.classList.toggle("hidden");
       const userMenu = document.getElementById("user-profile-menu");
       if (userMenu) userMenu.classList.add("hidden");
+      const filterPop = document.getElementById("filter-popover");
+      if (filterPop) filterPop.classList.add("hidden");
+      const expDropdown = document.getElementById("export-dropdown");
+      if (expDropdown) expDropdown.classList.add("hidden");
+    }
+
+    function toggleFilterPopover() {
+      const popover = document.getElementById("filter-popover");
+      if (!popover) return;
+      const isHidden = popover.classList.contains("hidden");
+
+      // Close other menus
+      const expDropdown = document.getElementById("export-dropdown");
+      if (expDropdown) expDropdown.classList.add("hidden");
+      const userMenu = document.getElementById("user-profile-menu");
+      if (userMenu) userMenu.classList.add("hidden");
+      const notifMenu = document.getElementById("notification-menu");
+      if (notifMenu) notifMenu.classList.add("hidden");
+
+      if (isHidden) {
+        popover.classList.remove("hidden");
+      } else {
+        popover.classList.add("hidden");
+      }
+    }
+
+    function toggleExportDropdown() {
+      const expDropdown = document.getElementById("export-dropdown");
+      if (!expDropdown) return;
+      const isHidden = expDropdown.classList.contains("hidden");
+
+      // Close other menus
+      const popover = document.getElementById("filter-popover");
+      if (popover) popover.classList.add("hidden");
+      const userMenu = document.getElementById("user-profile-menu");
+      if (userMenu) userMenu.classList.add("hidden");
+      const notifMenu = document.getElementById("notification-menu");
+      if (notifMenu) notifMenu.classList.add("hidden");
+
+      if (isHidden) {
+        expDropdown.classList.remove("hidden");
+      } else {
+        expDropdown.classList.add("hidden");
+      }
+    }
+
+    function setQuickDateRange(range) {
+      const sInput = document.getElementById("start-date");
+      const eInput = document.getElementById("end-date");
+      if (!sInput || !eInput) return;
+      if (range === 'all') {
+        sInput.value = "";
+        eInput.value = "";
+      } else if (range === '2025') {
+        sInput.value = "2025-01-01";
+        eInput.value = "2025-12-31";
+      } else if (range === '2026') {
+        sInput.value = "2026-01-01";
+        eInput.value = "2026-12-31";
+      }
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const popover = document.getElementById("filter-popover");
+      if (popover) popover.classList.add("hidden");
+
+      const regionInput = document.getElementById("region-filter");
+      const region = regionInput ? regionInput.value.trim() : "";
+
+      if (region) {
+        const match = Object.keys(countryToRegion).find(c => countryToRegion[c].toLowerCase() === region.toLowerCase());
+        currentActiveCountry = match || region;
+      } else {
+        currentActiveCountry = 'all';
+      }
+      updateMapHighlight(currentActiveCountry);
+
+      // Invalidate modal caches so data views reflect active filters
+      salesDataCache = null;
+      customersDataCache = null;
+
+      loadDashboardData();
+    }
+
+    function resetFilters() {
+      const sInput = document.getElementById("start-date");
+      const eInput = document.getElementById("end-date");
+      const rInput = document.getElementById("region-filter");
+
+      if (sInput) sInput.value = "";
+      if (eInput) eInput.value = "";
+      if (rInput) rInput.value = "";
+
+      currentActiveCountry = 'all';
+      updateMapHighlight('all');
+
+      salesDataCache = null;
+      customersDataCache = null;
+
+      const popover = document.getElementById("filter-popover");
+      if (popover) popover.classList.add("hidden");
+
+      loadDashboardData();
+    }
+
+    function renderLedger(data) {
+      // Safely re-render open explorer modal if currently viewing orders or transactions
+      const modal = document.getElementById("data-modal");
+      if (modal && !modal.classList.contains("hidden") && (currentModalView === 'order' || currentModalView === 'transactions')) {
+        salesDataCache = null;
+        openDataModal(currentModalView);
+      }
     }
 
     function markAllNotificationsRead() {
@@ -1449,6 +1578,24 @@
           if (res.ok) {
             const svgText = await res.text();
             wrapper.innerHTML = svgText;
+
+            // Interactive continent map clicks
+            const countryMap = [
+              { id: "map-america", name: "America" },
+              { id: "map-chile", name: "Atlanta" },
+              { id: "map-sweden", name: "Sweden" },
+              { id: "map-spain", name: "Spain" },
+              { id: "map-london", name: "London" },
+              { id: "map-germany", name: "Germany" }
+            ];
+            countryMap.forEach(item => {
+              const el = document.getElementById(item.id);
+              if (el) {
+                el.style.cursor = "pointer";
+                el.setAttribute("title", `Click to filter by ${item.name}`);
+                el.onclick = () => filterByCountry(item.name);
+              }
+            });
           }
         } catch (e) {
           console.warn("Could not load /static/world_map.svg:", e);
@@ -1475,6 +1622,8 @@
         currentActiveCountry = countryName;
         document.getElementById("region-filter").value = countryToRegion[countryName] || "";
       }
+      salesDataCache = null;
+      customersDataCache = null;
       updateMapHighlight(currentActiveCountry);
       loadDashboardData();
     }
@@ -1625,8 +1774,10 @@
         `;
 
         try {
+          const reg = document.getElementById("region-filter") ? document.getElementById("region-filter").value.trim() : "";
+          const cUrl = reg ? `/api/v1/customers?per_page=50&region=${encodeURIComponent(reg)}` : "/api/v1/customers?per_page=50";
           if (!customersDataCache) {
-            const res = await fetch("/api/v1/customers?per_page=50", { headers: authHeaders() });
+            const res = await fetch(cUrl, { headers: authHeaders() });
             const json = await res.json();
             customersDataCache = json.items || [];
           }
@@ -1773,8 +1924,16 @@
         `;
 
         try {
+          const sDate = document.getElementById("start-date") ? document.getElementById("start-date").value.trim() : "";
+          const eDate = document.getElementById("end-date") ? document.getElementById("end-date").value.trim() : "";
+          const reg = document.getElementById("region-filter") ? document.getElementById("region-filter").value.trim() : "";
+          const qParams = new URLSearchParams({ per_page: 50 });
+          if (sDate) qParams.append("start_date", sDate);
+          if (eDate) qParams.append("end_date", eDate);
+          if (reg) qParams.append("region", reg);
+
           if (!salesDataCache) {
-            const res = await fetch("/api/v1/sales?per_page=50", { headers: authHeaders() });
+            const res = await fetch(`/api/v1/sales?${qParams.toString()}`, { headers: authHeaders() });
             const json = await res.json();
             salesDataCache = json.items || [];
           }
@@ -1885,8 +2044,16 @@
             </div>
           `;
 
+          const sDate = document.getElementById("start-date") ? document.getElementById("start-date").value.trim() : "";
+          const eDate = document.getElementById("end-date") ? document.getElementById("end-date").value.trim() : "";
+          const reg = document.getElementById("region-filter") ? document.getElementById("region-filter").value.trim() : "";
+          const qParams = new URLSearchParams({ per_page: 50 });
+          if (sDate) qParams.append("start_date", sDate);
+          if (eDate) qParams.append("end_date", eDate);
+          if (reg) qParams.append("region", reg);
+
           if (!salesDataCache) {
-            const res = await fetch("/api/v1/sales?per_page=50", { headers: authHeaders() });
+            const res = await fetch(`/api/v1/sales?${qParams.toString()}`, { headers: authHeaders() });
             const json = await res.json();
             salesDataCache = json.items || [];
           }
