@@ -62,6 +62,51 @@ def create_app(config_name=None):
             "database": "connected"
         }), 200
 
+    @app.route("/api/v1/openapi.json", methods=["GET"])
+    def openapi_spec():
+        """Serve the OpenAPI 3.0 specification."""
+        from flask import Response
+        spec_path = os.path.join(os.path.dirname(app.root_path), "docs", "openapi.json")
+        if not os.path.exists(spec_path):
+            # Fallback to local app path if packaged
+            spec_path = os.path.join(app.root_path, "docs", "openapi.json")
+        try:
+            with open(spec_path, "r", encoding="utf-8") as f:
+                return Response(f.read(), mimetype="application/json")
+        except Exception:
+            return jsonify({"error": "OpenAPI specification file not found."}), 404
+
+    @app.route("/api/v1/docs", methods=["GET"])
+    def swagger_ui():
+        """Serve interactive Swagger UI documentation dashboard."""
+        return """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sales Analytics & BI REST API - Documentation</title>
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css" />
+    <style>
+        body { margin: 0; background: #fafafa; }
+        .swagger-ui .topbar { background-color: #1e3a8a; }
+    </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js" crossorigin></script>
+    <script>
+        window.onload = () => {
+            window.ui = SwaggerUIBundle({
+                url: '/api/v1/openapi.json',
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [SwaggerUIBundle.presets.apis],
+            });
+        };
+    </script>
+</body>
+</html>"""
+
     # CLI command to initialize database tables
     @app.cli.command("init-db")
     def init_db():

@@ -7,12 +7,8 @@
   },
   "servers": [
     {
-      "url": "http://127.0.0.1:5000",
-      "description": "Local Development Server"
-    },
-    {
-      "url": "https://sales-bi-api.onrender.com",
-      "description": "Render Production Deployment"
+      "url": "/",
+      "description": "Current Server"
     }
   ],
   "components": {
@@ -58,6 +54,30 @@
           "payment_method": { "type": "string", "default": "Credit Card", "example": "Credit Card" },
           "status": { "type": "string", "default": "Completed", "example": "Completed" }
         }
+      },
+      "CustomerCreateRequest": {
+        "type": "object",
+        "required": ["customer_code", "name", "region"],
+        "properties": {
+          "customer_code": { "type": "string", "example": "CUST-9001" },
+          "name": { "type": "string", "example": "Quantum Technologies" },
+          "email": { "type": "string", "format": "email", "example": "contact@quantum.io" },
+          "phone": { "type": "string", "example": "+1-555-0199" },
+          "region": { "type": "string", "example": "North" },
+          "segment": { "type": "string", "enum": ["Consumer", "SMB", "Enterprise"], "default": "Consumer" }
+        }
+      },
+      "ProductCreateRequest": {
+        "type": "object",
+        "required": ["sku", "name", "category", "unit_cost", "unit_price"],
+        "properties": {
+          "sku": { "type": "string", "example": "SKU-AI-900" },
+          "name": { "type": "string", "example": "Enterprise Neural Accelerator" },
+          "category": { "type": "string", "example": "Electronics" },
+          "unit_cost": { "type": "number", "format": "float", "example": 800.00 },
+          "unit_price": { "type": "number", "format": "float", "example": 1899.99 },
+          "is_active": { "type": "boolean", "default": true }
+        }
       }
     }
   },
@@ -98,6 +118,15 @@
         }
       }
     },
+    "/api/v1/auth/me": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Retrieve profile of authenticated user",
+        "responses": {
+          "200": { "description": "User profile" }
+        }
+      }
+    },
     "/api/v1/sales": {
       "get": {
         "tags": ["Sales Management"],
@@ -108,7 +137,9 @@
           { "name": "start_date", "in": "query", "schema": { "type": "string", "format": "date" } },
           { "name": "end_date", "in": "query", "schema": { "type": "string", "format": "date" } },
           { "name": "region", "in": "query", "schema": { "type": "string" } },
-          { "name": "status", "in": "query", "schema": { "type": "string" } }
+          { "name": "status", "in": "query", "schema": { "type": "string" } },
+          { "name": "min_amount", "in": "query", "schema": { "type": "number" } },
+          { "name": "max_amount", "in": "query", "schema": { "type": "number" } }
         ],
         "responses": {
           "200": { "description": "Paginated sales array" }
@@ -124,6 +155,26 @@
         "responses": {
           "201": { "description": "Sales record created" }
         }
+      }
+    },
+    "/api/v1/sales/{id}": {
+      "get": {
+        "tags": ["Sales Management"],
+        "summary": "Get sale by ID",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Sale detail" }, "404": { "description": "Not found" } }
+      },
+      "put": {
+        "tags": ["Sales Management"],
+        "summary": "Update sale by ID",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Sale updated" } }
+      },
+      "delete": {
+        "tags": ["Sales Management"],
+        "summary": "Delete sale by ID (Admin only)",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Sale deleted" }, "403": { "description": "Forbidden" } }
       }
     },
     "/api/v1/sales/upload": {
@@ -162,12 +213,62 @@
         }
       }
     },
+    "/api/v1/analytics/products/top": {
+      "get": {
+        "tags": ["Business Intelligence & Analytics"],
+        "summary": "Top selling products by revenue, units, or profit",
+        "parameters": [
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 10 } },
+          { "name": "order_by", "in": "query", "schema": { "type": "string", "enum": ["revenue", "units_sold", "profit", "orders"], "default": "revenue" } }
+        ],
+        "responses": { "200": { "description": "Ranked product list" } }
+      }
+    },
+    "/api/v1/analytics/regions": {
+      "get": {
+        "tags": ["Business Intelligence & Analytics"],
+        "summary": "Regional sales and profit breakdown",
+        "responses": { "200": { "description": "Regional performance data" } }
+      }
+    },
     "/api/v1/analytics/trends/monthly": {
       "get": {
         "tags": ["Business Intelligence & Analytics"],
         "summary": "Monthly sales trends with MoM % growth rates",
         "responses": {
           "200": { "description": "Monthly time-series array" }
+        }
+      }
+    },
+    "/api/v1/analytics/trends/yearly": {
+      "get": {
+        "tags": ["Business Intelligence & Analytics"],
+        "summary": "Yearly sales trends with YoY % growth rates",
+        "responses": {
+          "200": { "description": "Yearly trends array" }
+        }
+      }
+    },
+    "/api/v1/analytics/customers/top": {
+      "get": {
+        "tags": ["Business Intelligence & Analytics"],
+        "summary": "Top customer accounts by spend and transaction volume",
+        "responses": { "200": { "description": "Top customers" } }
+      }
+    },
+    "/api/v1/analytics/stats": {
+      "get": {
+        "tags": ["Business Intelligence & Analytics"],
+        "summary": "Statistical distributions via NumPy/Pandas (mean, median, IQR)",
+        "responses": { "200": { "description": "Statistical summary" } }
+      }
+    },
+    "/api/v1/reports/export/csv": {
+      "get": {
+        "tags": ["Reports & Exports"],
+        "summary": "Download filtered sales records as CSV",
+        "responses": {
+          "200": { "description": "CSV stream", "content": { "text/csv": {} } }
         }
       }
     },
@@ -181,6 +282,38 @@
             "content": { "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {} }
           }
         }
+      }
+    },
+    "/api/v1/customers": {
+      "get": {
+        "tags": ["Customers"],
+        "summary": "List customers with search and pagination",
+        "responses": { "200": { "description": "Customers list" } }
+      },
+      "post": {
+        "tags": ["Customers"],
+        "summary": "Create customer",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CustomerCreateRequest" } } }
+        },
+        "responses": { "201": { "description": "Customer created" } }
+      }
+    },
+    "/api/v1/products": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "List products with search and pagination",
+        "responses": { "200": { "description": "Products list" } }
+      },
+      "post": {
+        "tags": ["Products"],
+        "summary": "Create product (Admin/Analyst)",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProductCreateRequest" } } }
+        },
+        "responses": { "201": { "description": "Product created" } }
       }
     }
   }
