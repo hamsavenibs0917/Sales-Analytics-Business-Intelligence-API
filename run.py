@@ -7,15 +7,12 @@ from scripts.seed_db import seed_database
 env = os.getenv("FLASK_ENV", "development")
 app = create_app(env)
 
-# Auto-create tables and auto-seed if database is fresh / empty
-with app.app_context():
-    db.create_all()
-    try:
-        if Sale.query.count() == 0:
-            print("Empty database detected: auto-seeding with master data and sample sales...")
-            seed_database(app)
-    except Exception as e:
-        print(f"Notice: Auto-seed check: {e}")
+# Safely ensure database tables exist without crashing multi-worker Gunicorn boot
+try:
+    with app.app_context():
+        db.create_all()
+except Exception as err:
+    app.logger.warning(f"Database table verification notice: {err}")
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))

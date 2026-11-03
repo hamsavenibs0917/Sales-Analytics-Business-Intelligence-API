@@ -28,8 +28,19 @@ def seed_database(target_app=None):
             app_to_use = create_app(os.getenv("FLASK_ENV", "development"))
 
     with app_to_use.app_context():
-        print("Creating all database tables...")
-        db.create_all()
+        try:
+            print("Creating all database tables...")
+            db.create_all()
+        except Exception as e:
+            print(f"Notice: table verification: {e}")
+
+        # Quick idempotency check: If admin user and sales already exist, skip immediately
+        try:
+            if User.query.filter_by(email="admin@company.com").first() and Sale.query.first():
+                print(f" -> Database already initialized and seeded with {Sale.query.count()} sales records. Skipping.")
+                return
+        except Exception:
+            pass
 
         # 1. Seed Users
         users_data = [

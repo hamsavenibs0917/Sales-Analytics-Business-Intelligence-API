@@ -152,13 +152,13 @@ def get_dashboard_overview():
     from sqlalchemy import func
     from app.extensions import db
 
-    # Auto-seed if database is empty
-    if Sale.query.count() == 0:
-        from scripts.seed_db import seed_database
-        try:
+    # Auto-seed if database is empty on first request
+    try:
+        if Sale.query.first() is None:
+            from scripts.seed_db import seed_database
             seed_database()
-        except Exception:
-            pass
+    except Exception:
+        pass
 
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")

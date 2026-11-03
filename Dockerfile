@@ -50,4 +50,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:${PORT:-5000}/health || exit 1
 
 # Start Gunicorn binding dynamically to Render's $PORT (fallback to 5000)
-CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT:-5000} run:app --workers 2 --threads 4 --timeout 120"]
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT:-5000} run:app --workers 2 --threads 4 --timeout 120 --preload"]
