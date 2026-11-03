@@ -12,7 +12,7 @@ customer_schema = CustomerSchema()
 customer_list_schema = CustomerSchema(many=True)
 
 @customers_bp.route("", methods=["GET"])
-@jwt_required()
+@jwt_required(optional=True)
 def list_customers():
     """List customers with pagination and filtering."""
     query = Customer.query

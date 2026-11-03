@@ -15,7 +15,7 @@ from app.utils.pagination import paginate_query
 sales_bp = Blueprint("sales", __name__)
 
 @sales_bp.route("", methods=["GET"])
-@jwt_required()
+@jwt_required(optional=True)
 def list_sales():
     """
     List sales records with pagination and multi-parameter filtering.

@@ -12,7 +12,7 @@ product_schema = ProductSchema()
 product_list_schema = ProductSchema(many=True)
 
 @products_bp.route("", methods=["GET"])
-@jwt_required()
+@jwt_required(optional=True)
 def list_products():
     """List products with pagination and filtering."""
     query = Product.query
