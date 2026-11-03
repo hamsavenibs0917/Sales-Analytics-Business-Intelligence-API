@@ -8,7 +8,7 @@ from app.services.report_service import ReportService
 reports_bp = Blueprint("reports", __name__)
 
 @reports_bp.route("/export/csv", methods=["GET"])
-@jwt_required()
+@jwt_required(optional=True)
 def export_csv():
     """Export filtered sales data to CSV."""
     start_date = request.args.get("start_date")
@@ -32,7 +32,7 @@ def export_csv():
 
 
 @reports_bp.route("/export/excel", methods=["GET"])
-@jwt_required()
+@jwt_required(optional=True)
 def export_excel():
     """Export multi-tab executive BI report to Excel (.xlsx)."""
     start_date = request.args.get("start_date")

@@ -3,353 +3,643 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sales Analytics & Business Intelligence Dashboard</title>
+  <title>Sales Analyzer - Executive Business Intelligence & Analytics</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- FontAwesome CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
           colors: {
             brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-              800: '#3730a3',
-              900: '#1e1b4b',
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              200: '#ddd6fe',
+              300: '#c4b5fd',
+              400: '#a78bfa',
+              500: '#8b5cf6',
+              600: '#6366f1',
+              700: '#4f46e5',
+              800: '#4338ca',
+              900: '#312e81',
             }
           }
         }
       }
     }
   </script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 8px;
+    }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
+<body class="bg-[#ebeef5] dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen p-2 sm:p-4 lg:p-6 flex justify-center items-center transition-colors duration-200">
 
-  <!-- Top Navigation Header -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white shadow-md">
-          <i class="fa-solid fa-chart-line text-lg"></i>
+  <!-- Master Dashboard Window Container -->
+  <div class="w-full max-w-[1560px] bg-white dark:bg-slate-900 rounded-[28px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.07)] border border-slate-200/80 dark:border-slate-800 flex flex-col lg:flex-row overflow-hidden min-h-[920px]">
+
+    <!-- ========================================== -->
+    <!-- LEFT SIDEBAR -->
+    <!-- ========================================== -->
+    <aside class="w-full lg:w-64 bg-[#fafbfc] dark:bg-slate-900/90 border-r border-slate-150 dark:border-slate-800 flex flex-col justify-between p-5 shrink-0">
+      <div class="space-y-7">
+        <!-- Logo Header -->
+        <div class="flex items-center space-x-3 px-2">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-700 via-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-200 dark:shadow-none">
+            <i class="fa-solid fa-chart-pie text-lg"></i>
+          </div>
+          <div>
+            <h1 class="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">Sales Analyzer</h1>
+            <p class="text-[11px] text-slate-400 font-medium">Business Intelligence</p>
+          </div>
         </div>
-        <div>
-          <h1 class="text-lg font-bold text-slate-900 leading-tight">SalesBI Analytics</h1>
-          <p class="text-xs text-slate-500">Executive Business Intelligence Suite</p>
-        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="space-y-1.5 text-xs font-semibold">
+          <a href="javascript:void(0)" onclick="switchTab('analytics')" id="nav-dashboard" class="flex items-center space-x-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-100/70 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition">
+            <i class="fa-solid fa-gauge text-sm w-4"></i>
+            <span>Dashboard</span>
+          </a>
+
+          <a href="javascript:void(0)" onclick="openLedgerModal('customer')" class="flex items-center space-x-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-100/70 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition">
+            <i class="fa-regular fa-user text-sm w-4"></i>
+            <span>Customer</span>
+          </a>
+
+          <a href="javascript:void(0)" onclick="openLedgerModal('product')" class="flex items-center space-x-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-100/70 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition">
+            <i class="fa-solid fa-box-open text-sm w-4"></i>
+            <span>Product</span>
+          </a>
+
+          <a href="javascript:void(0)" onclick="openLedgerModal('transactions')" class="flex items-center space-x-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-100/70 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition">
+            <i class="fa-solid fa-bag-shopping text-sm w-4"></i>
+            <span>Order</span>
+          </a>
+
+          <!-- Active Analytics Tab -->
+          <a href="javascript:void(0)" onclick="switchTab('analytics')" id="nav-analytics" class="flex items-center space-x-3.5 px-4 py-3 rounded-2xl bg-brand-600 text-white shadow-md shadow-brand-500/25 transition">
+            <i class="fa-solid fa-chart-line text-sm w-4"></i>
+            <span>Analytics</span>
+          </a>
+
+          <a href="javascript:void(0)" onclick="openLedgerModal('transactions')" class="flex items-center space-x-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-100/70 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition">
+            <i class="fa-solid fa-receipt text-sm w-4"></i>
+            <span>Transactions</span>
+          </a>
+
+          <a href="javascript:void(0)" onclick="openUploadModal()" class="flex items-center justify-between px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-100/70 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition">
+            <div class="flex items-center space-x-3.5">
+              <i class="fa-solid fa-bullhorn text-sm w-4"></i>
+              <span>Dataset Upload</span>
+            </div>
+            <span class="text-[9px] uppercase tracking-wider font-extrabold bg-violet-100 text-brand-700 px-1.5 py-0.5 rounded-md">NEW</span>
+          </a>
+
+          <a href="/api/v1/docs" target="_blank" class="flex items-center space-x-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-100/70 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition">
+            <i class="fa-solid fa-book-open text-sm w-4"></i>
+            <span>Swagger API</span>
+          </a>
+        </nav>
       </div>
 
-      <div class="flex items-center space-x-2 sm:space-x-3">
-        <span id="api-status" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
-          <span class="w-2 h-2 mr-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Connected
-        </span>
-
-        <button id="seed-btn" onclick="triggerManualSeed()" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition border border-indigo-200">
-          <i class="fa-solid fa-database mr-1.5 text-indigo-600"></i> Seed 200+ Demo Records
+      <!-- Sidebar Bottom Area -->
+      <div class="pt-6 border-t border-slate-200/60 dark:border-slate-800 space-y-4">
+        <button onclick="triggerManualSeed()" id="seed-btn" class="w-full text-left flex items-center space-x-3 px-3 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 hover:bg-indigo-50/50 rounded-xl transition">
+          <i class="fa-solid fa-database text-slate-400"></i>
+          <span>Re-seed 227 Records</span>
         </button>
 
-        <a href="/api/v1/docs" target="_blank" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
-          <i class="fa-solid fa-book-open mr-1.5"></i> Swagger Docs
+        <a href="javascript:void(0)" onclick="openLedgerModal('stats')" class="flex items-center space-x-3 px-3 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 rounded-xl transition">
+          <i class="fa-regular fa-circle-question text-slate-400"></i>
+          <span>NumPy Statistics</span>
         </a>
 
-        <button onclick="openUploadModal()" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-sm transition">
-          <i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> Ingest Dataset
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Container -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-
-    <!-- Filters & Action Bar -->
-    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
-      <div class="flex flex-wrap items-center gap-3">
-        <div>
-          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Start Date</label>
-          <input type="date" id="start-date" class="border border-slate-300 rounded-lg text-xs px-2.5 py-1.5 focus:ring-2 focus:ring-brand-500 focus:outline-none">
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">End Date</label>
-          <input type="date" id="end-date" class="border border-slate-300 rounded-lg text-xs px-2.5 py-1.5 focus:ring-2 focus:ring-brand-500 focus:outline-none">
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Region</label>
-          <select id="region-filter" class="border border-slate-300 rounded-lg text-xs px-2.5 py-1.5 focus:ring-2 focus:ring-brand-500 focus:outline-none">
-            <option value="">All Regions</option>
-            <option value="North">North</option>
-            <option value="South">South</option>
-            <option value="East">East</option>
-            <option value="West">West</option>
-            <option value="Central">Central</option>
-            <option value="International">International</option>
-          </select>
-        </div>
-
-        <div class="pt-5 flex items-center space-x-2">
-          <button onclick="applyFilters()" class="px-4 py-1.5 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition shadow-sm">
-            <i class="fa-solid fa-filter mr-1"></i> Apply Filters
+        <!-- Light / Dark Mode Toggle Pill -->
+        <div class="bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl flex items-center justify-between text-xs font-bold text-slate-500">
+          <button id="theme-light-btn" onclick="setTheme('light')" class="flex-1 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 bg-white text-slate-900 shadow-sm transition">
+            <i class="fa-regular fa-sun text-amber-500 text-xs"></i>
+            <span class="text-[11px]">Light</span>
           </button>
-          <button onclick="resetFilters()" class="px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 transition bg-slate-100 rounded-lg">
-            Reset
+          <button id="theme-dark-btn" onclick="setTheme('dark')" class="flex-1 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white transition">
+            <i class="fa-regular fa-moon text-xs"></i>
+            <span class="text-[11px]">Dark</span>
           </button>
         </div>
       </div>
+    </aside>
 
-      <!-- Export Buttons -->
-      <div class="flex items-center space-x-2">
-        <button onclick="exportReport('excel')" class="inline-flex items-center px-3 py-1.5 border border-emerald-600 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg text-xs font-semibold transition">
-          <i class="fa-solid fa-file-excel mr-1.5 text-emerald-600"></i> Export Excel (.xlsx)
-        </button>
-        <button onclick="exportReport('csv')" class="inline-flex items-center px-3 py-1.5 border border-blue-600 text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg text-xs font-semibold transition">
-          <i class="fa-solid fa-file-csv mr-1.5 text-blue-600"></i> Export CSV
-        </button>
-      </div>
-    </div>
+    <!-- ========================================== -->
+    <!-- MAIN CONTENT AREA -->
+    <!-- ========================================== -->
+    <main class="flex-1 bg-white dark:bg-slate-900 p-5 sm:p-7 lg:p-8 overflow-y-auto space-y-6">
 
-    <!-- Active Filters Notification Banner -->
-    <div id="filter-banner" class="bg-indigo-50 border border-indigo-200 text-indigo-900 px-4 py-2 rounded-xl text-xs flex items-center justify-between">
-      <div class="flex items-center space-x-2">
-        <i class="fa-solid fa-circle-info text-indigo-600"></i>
-        <span id="filter-summary-text">Displaying all-time sales records across all territories.</span>
-      </div>
-      <button onclick="resetFilters()" class="text-indigo-700 underline font-semibold hover:text-indigo-900">Clear</button>
-    </div>
-
-    <!-- KPI Metric Cards Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
-      <!-- Total Revenue -->
-      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-medium text-slate-500 uppercase">Gross Revenue</span>
-          <span class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm">
-            <i class="fa-solid fa-dollar-sign"></i>
-          </span>
+      <!-- Top Header Navigation Bar -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <!-- Search Bar -->
+        <div class="relative w-full sm:w-80">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+          <input 
+            type="text" 
+            id="global-search" 
+            oninput="handleSearch(this.value)" 
+            placeholder="Search anything" 
+            class="w-full bg-[#f8f9fc] dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl pl-9 pr-4 py-2 text-xs font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition"
+          >
         </div>
-        <div id="kpi-revenue" class="text-xl font-bold text-slate-900">$0.00</div>
-        <span class="text-[11px] text-emerald-600 font-semibold"><i class="fa-solid fa-arrow-trend-up mr-1"></i>Total Revenue</span>
-      </div>
 
-      <!-- Net Profit -->
-      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-medium text-slate-500 uppercase">Net Profit</span>
-          <span class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm">
-            <i class="fa-solid fa-sack-dollar"></i>
-          </span>
+        <!-- Right Quick Actions: Notes, Bell, Avatar, Filter & Export -->
+        <div class="flex items-center space-x-2.5 sm:space-x-3 self-end sm:self-auto">
+          <!-- Notification Bell -->
+          <button class="w-9 h-9 rounded-2xl border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-50 transition relative">
+            <i class="fa-regular fa-bell text-xs"></i>
+            <span class="absolute top-2 right-2 w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
+          </button>
+
+          <!-- User Profile -->
+          <div class="flex items-center space-x-2.5 pl-1 pr-3 py-1 rounded-2xl border border-slate-200/80 dark:border-slate-700">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="w-7 h-7 rounded-full object-cover">
+            <div class="text-left hidden md:block">
+              <p class="text-xs font-bold text-slate-800 dark:text-white leading-tight">Alex Smith</p>
+              <p class="text-[10px] text-slate-400 font-medium">Business</p>
+            </div>
+          </div>
+
+          <!-- Filter By Button with Dropdown Popover -->
+          <div class="relative">
+            <button 
+              id="filter-toggle-btn" 
+              onclick="toggleFilterPopover()" 
+              class="inline-flex items-center px-4 py-2 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300/80 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition space-x-2 shadow-sm"
+            >
+              <i class="fa-solid fa-filter text-[11px] text-brand-600"></i>
+              <span>Filter by</span>
+              <span id="active-filter-badge" class="hidden ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-brand-600 text-white">0</span>
+            </button>
+
+            <!-- Floating Filter Popover Modal -->
+            <div 
+              id="filter-popover" 
+              class="hidden absolute right-0 top-12 w-80 sm:w-96 bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 p-5 z-40 space-y-4"
+            >
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-700">
+                <h4 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Filter Data Criteria</h4>
+                <button onclick="toggleFilterPopover()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+              </div>
+
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Date Range</label>
+                  <div class="grid grid-cols-2 gap-2">
+                    <input type="date" id="start-date" class="w-full text-xs p-2 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                    <input type="date" id="end-date" class="w-full text-xs p-2 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">Geographical Region</label>
+                  <select id="region-filter" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                    <option value="">All Regions</option>
+                    <option value="North">North</option>
+                    <option value="South">South</option>
+                    <option value="East">East</option>
+                    <option value="West">West</option>
+                    <option value="Central">Central</option>
+                    <option value="International">International</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-700">
+                <button onclick="resetFilters()" class="text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-white">Reset All</button>
+                <button onclick="applyFilters()" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-md transition">Apply Filters</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Export Button with Dropdown -->
+          <div class="relative">
+            <button 
+              id="export-toggle-btn" 
+              onclick="toggleExportDropdown()" 
+              class="inline-flex items-center px-4 py-2 rounded-2xl text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-md shadow-brand-500/20 transition space-x-2"
+            >
+              <i class="fa-solid fa-arrow-up-from-bracket text-[11px]"></i>
+              <span>Export</span>
+            </button>
+
+            <div 
+              id="export-dropdown" 
+              class="hidden absolute right-0 top-12 w-48 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-2 z-40 space-y-1"
+            >
+              <button onclick="triggerExport('excel')" class="w-full text-left flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-700 rounded-xl transition">
+                <i class="fa-solid fa-file-excel text-emerald-600"></i>
+                <span>Export Excel (.xlsx)</span>
+              </button>
+              <button onclick="triggerExport('csv')" class="w-full text-left flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-xl transition">
+                <i class="fa-solid fa-file-csv text-blue-600"></i>
+                <span>Export CSV (.csv)</span>
+              </button>
+            </div>
+          </div>
         </div>
-        <div id="kpi-profit" class="text-xl font-bold text-slate-900">$0.00</div>
-        <span class="text-[11px] text-indigo-600 font-semibold">After Unit Costs</span>
       </div>
 
-      <!-- Profit Margin % -->
-      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-medium text-slate-500 uppercase">Gross Margin</span>
-          <span class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-sm">
-            <i class="fa-solid fa-percent"></i>
-          </span>
+      <!-- Title & Subtitle Section -->
+      <div>
+        <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Sales Analytics</h2>
+        <p id="filter-status-label" class="text-xs text-slate-400 font-medium mt-0.5">Your Total Analytics Report & Business Intelligence Statistics</p>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- ROW 1: 4 TOP METRIC CARDS -->
+      <!-- ========================================== -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <!-- 1. Total Sales -->
+        <div class="bg-white dark:bg-slate-800/80 p-5 rounded-3xl border border-slate-150 dark:border-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col justify-between space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 text-xs">
+                <i class="fa-solid fa-rotate-left"></i>
+              </div>
+              <span class="text-xs font-bold text-slate-600 dark:text-slate-300">Total Sales</span>
+            </div>
+            <button class="text-slate-400 hover:text-slate-600 text-xs"><i class="fa-solid fa-ellipsis"></i></button>
+          </div>
+
+          <div class="flex items-baseline space-x-2">
+            <span id="kpi-revenue" class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">$0.00</span>
+            <span class="text-xs font-bold text-emerald-500 flex items-center">
+              <i class="fa-solid fa-arrow-trend-up text-[10px] mr-1"></i>+12%
+            </span>
+          </div>
+
+          <div class="pt-1 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px] text-slate-400 font-medium">
+            <span>Average of Total Sales</span>
+            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </div>
         </div>
-        <div id="kpi-margin" class="text-xl font-bold text-slate-900">0.0%</div>
-        <span class="text-[11px] text-purple-600 font-semibold">Profitability Ratio</span>
-      </div>
 
-      <!-- Total Units Sold -->
-      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-medium text-slate-500 uppercase">Units Sold</span>
-          <span class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm">
-            <i class="fa-solid fa-boxes-stacked"></i>
-          </span>
+        <!-- 2. Total Order -->
+        <div class="bg-white dark:bg-slate-800/80 p-5 rounded-3xl border border-slate-150 dark:border-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col justify-between space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 text-xs">
+                <i class="fa-regular fa-user"></i>
+              </div>
+              <span class="text-xs font-bold text-slate-600 dark:text-slate-300">Total order</span>
+            </div>
+            <button class="text-slate-400 hover:text-slate-600 text-xs"><i class="fa-solid fa-ellipsis"></i></button>
+          </div>
+
+          <div class="flex items-baseline space-x-2">
+            <span id="kpi-orders" class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">0</span>
+            <span class="text-xs font-bold text-rose-500 flex items-center">
+              <i class="fa-solid fa-arrow-trend-down text-[10px] mr-1"></i>-5%
+            </span>
+          </div>
+
+          <div class="pt-1 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px] text-slate-400 font-medium">
+            <span>Average of Total order</span>
+            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </div>
         </div>
-        <div id="kpi-units" class="text-xl font-bold text-slate-900">0</div>
-        <span class="text-[11px] text-amber-600 font-semibold">Total Quantity</span>
-      </div>
 
-      <!-- Total Transactions -->
-      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-medium text-slate-500 uppercase">Orders</span>
-          <span class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-sm">
-            <i class="fa-solid fa-receipt"></i>
-          </span>
+        <!-- 3. Conversion / Profit Margin -->
+        <div class="bg-white dark:bg-slate-800/80 p-5 rounded-3xl border border-slate-150 dark:border-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col justify-between space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 text-xs">
+                <i class="fa-solid fa-percent"></i>
+              </div>
+              <span class="text-xs font-bold text-slate-600 dark:text-slate-300">Conversion rate</span>
+            </div>
+            <button class="text-slate-400 hover:text-slate-600 text-xs"><i class="fa-solid fa-ellipsis"></i></button>
+          </div>
+
+          <div class="flex items-baseline space-x-2">
+            <span id="kpi-margin" class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">0.0%</span>
+            <span class="text-xs font-bold text-emerald-500 flex items-center">
+              <i class="fa-solid fa-arrow-trend-up text-[10px] mr-1"></i>+3%
+            </span>
+          </div>
+
+          <div class="pt-1 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px] text-slate-400 font-medium">
+            <span>Average of Conversion Rate</span>
+            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </div>
         </div>
-        <div id="kpi-orders" class="text-xl font-bold text-slate-900">0</div>
-        <span class="text-[11px] text-sky-600 font-semibold">Transactions</span>
-      </div>
 
-      <!-- Average Order Value (AOV) -->
-      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-medium text-slate-500 uppercase">Avg Order (AOV)</span>
-          <span class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center text-sm">
-            <i class="fa-solid fa-cart-shopping"></i>
-          </span>
+        <!-- 4. Average Order Value -->
+        <div class="bg-white dark:bg-slate-800/80 p-5 rounded-3xl border border-slate-150 dark:border-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col justify-between space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 text-xs">
+                <i class="fa-solid fa-sack-dollar"></i>
+              </div>
+              <span class="text-xs font-bold text-slate-600 dark:text-slate-300">Average Order Value</span>
+            </div>
+            <button class="text-slate-400 hover:text-slate-600 text-xs"><i class="fa-solid fa-ellipsis"></i></button>
+          </div>
+
+          <div class="flex items-baseline space-x-2">
+            <span id="kpi-aov" class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">$0.00</span>
+            <span class="text-xs font-bold text-emerald-500 flex items-center">
+              <i class="fa-solid fa-arrow-trend-up text-[10px] mr-1"></i>+8%
+            </span>
+          </div>
+
+          <div class="pt-1 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px] text-slate-400 font-medium">
+            <span>Average of Order Value</span>
+            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </div>
         </div>
-        <div id="kpi-aov" class="text-xl font-bold text-slate-900">$0.00</div>
-        <span class="text-[11px] text-rose-600 font-semibold">Avg Basket Size</span>
       </div>
-    </div>
 
-    <!-- Charts Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Monthly Revenue & Profit Trends (2 cols) -->
-      <div class="lg:col-span-2 bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-        <div class="flex items-center justify-between mb-4">
+      <!-- ========================================== -->
+      <!-- ROW 2: TOTAL REVENUE SPLINE + REGION MAP -->
+      <!-- ========================================== -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Total Revenue Wave Spline Chart (2 cols) -->
+        <div class="lg:col-span-2 bg-white dark:bg-slate-800/80 p-6 rounded-3xl border border-slate-150 dark:border-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col justify-between">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Revenue</p>
+              <div class="flex items-baseline space-x-3 mt-1">
+                <h3 id="headline-revenue" class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">$0.00</h3>
+              </div>
+              <p class="text-xs font-semibold text-slate-400 mt-1 flex items-center">
+                <span>Active Period</span>
+                <span class="text-emerald-500 font-bold ml-1.5 flex items-center">
+                  <i class="fa-solid fa-arrow-trend-up text-[10px] mr-1"></i>+12%
+                </span>
+              </p>
+            </div>
+
+            <!-- Timeframe dropdown -->
+            <div class="relative">
+              <button class="text-xs font-semibold text-slate-500 dark:text-slate-300 bg-slate-100 dark:bg-slate-700/70 px-3 py-1.5 rounded-xl flex items-center space-x-1.5">
+                <span>Monthly</span>
+                <i class="fa-solid fa-chevron-down text-[10px]"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Spline Line Chart Canvas -->
+          <div class="relative h-64 sm:h-72 mt-4">
+            <canvas id="revenueSplineChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Customer by Country / Region Map Card (1 col) -->
+        <div class="bg-white dark:bg-slate-800/80 p-6 rounded-3xl border border-slate-150 dark:border-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col justify-between relative overflow-hidden">
           <div>
-            <h2 class="text-sm font-bold text-slate-900">Monthly Revenue & Profit Trajectory</h2>
-            <p class="text-xs text-slate-500">Month-over-Month (MoM) growth calculated with Pandas</p>
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white">Customer by Country</h3>
+            <p class="text-[11px] text-slate-400">Territory performance distribution</p>
           </div>
-          <span class="text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md font-medium">Time-Series</span>
-        </div>
-        <div class="h-72">
-          <canvas id="monthlyTrendChart"></canvas>
+
+          <!-- Stylized World Map Graphic -->
+          <div class="relative my-4 flex items-center justify-center py-2">
+            <svg viewBox="0 0 450 250" class="w-full h-auto text-slate-200 dark:text-slate-700 fill-current opacity-80">
+              <!-- Simplified Vector World Continents -->
+              <path d="M 50,40 Q 90,20 120,40 Q 140,70 110,100 Q 80,110 50,80 Z" class="text-indigo-600/90 fill-current"></path>
+              <path d="M 85,120 Q 115,110 125,140 Q 110,190 95,210 Q 75,180 85,120 Z" class="text-indigo-400 fill-current"></path>
+              <path d="M 180,35 Q 230,25 240,65 Q 210,80 180,70 Z"></path>
+              <path d="M 175,90 Q 230,85 240,140 Q 210,210 185,170 Q 165,120 175,90 Z"></path>
+              <path d="M 260,30 Q 360,10 400,60 Q 380,120 300,100 Q 260,70 260,30 Z"></path>
+              <path d="M 330,130 Q 390,130 380,180 Q 330,190 330,130 Z"></path>
+            </svg>
+
+            <!-- Floating Overlay Badge (matches reference image) -->
+            <div class="absolute left-6 top-8 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm p-3.5 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 text-left min-w-[150px]">
+              <p class="text-[11px] font-bold text-slate-900 dark:text-white mb-2">6 Active Regions</p>
+              <ul id="region-legend-list" class="space-y-1 text-[10px] font-medium text-slate-500 dark:text-slate-400">
+                <li class="flex items-center space-x-2"><span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span><span>North</span></li>
+                <li class="flex items-center space-x-2"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span><span>South</span></li>
+                <li class="flex items-center space-x-2"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span><span>Central</span></li>
+                <li class="flex items-center space-x-2"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span><span>West</span></li>
+                <li class="flex items-center space-x-2"><span class="w-1.5 h-1.5 rounded-full bg-violet-500"></span><span>East</span></li>
+                <li class="flex items-center space-x-2"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span><span>International</span></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <span>Global territory coverage</span>
+            <span class="font-bold text-brand-600">100% active</span>
+          </div>
         </div>
       </div>
 
-      <!-- Regional Share Donut (1 col) -->
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h2 class="text-sm font-bold text-slate-900">Regional Performance</h2>
-            <p class="text-xs text-slate-500">Revenue contribution % by territory</p>
+      <!-- ========================================== -->
+      <!-- ROW 3: BEST SELLING PRODUCT + SELLING SOURCE -->
+      <!-- ========================================== -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Best Selling Product Table (2 cols) -->
+        <div class="lg:col-span-2 bg-white dark:bg-slate-800/80 p-6 rounded-3xl border border-slate-150 dark:border-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Best Selling Product</h3>
+              <p class="text-[11px] text-slate-400">Ranked by gross sales volume and earnings</p>
+            </div>
+            <button onclick="openLedgerModal('transactions')" class="text-xs font-bold text-brand-600 hover:text-brand-700">View All</button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="text-slate-400 font-semibold border-b border-slate-100 dark:border-slate-700/60 pb-2">
+                  <th class="pb-3 font-semibold">Product Name</th>
+                  <th class="pb-3 font-semibold">Brand</th>
+                  <th class="pb-3 font-semibold text-center">Quantity</th>
+                  <th class="pb-3 font-semibold text-right">Price</th>
+                  <th class="pb-3 font-semibold text-right">Earning</th>
+                </tr>
+              </thead>
+              <tbody id="best-products-body" class="divide-y divide-slate-100 dark:divide-slate-700/40 font-medium text-slate-700 dark:text-slate-200">
+                <tr>
+                  <td colspan="5" class="py-8 text-center text-slate-400">Loading catalog items...</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
-        <div class="flex-1 flex items-center justify-center h-64">
-          <canvas id="regionalChart"></canvas>
+
+        <!-- Total Selling Source / Regional Share Donut (1 col) -->
+        <div class="bg-white dark:bg-slate-800/80 p-6 rounded-3xl border border-slate-150 dark:border-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Total Selling Source</h3>
+              <p class="text-[11px] text-slate-400">Regional sales volume share</p>
+            </div>
+            <button class="text-slate-400 hover:text-slate-600 text-xs"><i class="fa-solid fa-sliders"></i></button>
+          </div>
+
+          <div class="relative flex items-center justify-center my-2">
+            <div class="w-48 h-48 sm:w-52 sm:h-52 relative">
+              <canvas id="sellingSourceDonut"></canvas>
+              <!-- Center Text Overlay -->
+              <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
+                <span id="donut-center-revenue" class="text-base font-extrabold text-slate-900 dark:text-white">$0.00</span>
+                <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Total Sale</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Legend -->
+          <div id="selling-source-legend" class="grid grid-cols-2 gap-2 text-xs pt-3 border-t border-slate-100 dark:border-slate-800">
+            <!-- Populated dynamically via JS -->
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Second Row: Top Products & Summary Stats -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Top Products (2 cols) -->
-      <div class="lg:col-span-2 bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h2 class="text-sm font-bold text-slate-900">Top-Selling Products</h2>
-            <p class="text-xs text-slate-500">Ranked by gross sales volume and profit</p>
-          </div>
-        </div>
-        <div class="h-64">
-          <canvas id="productsChart"></canvas>
-        </div>
-      </div>
+    </main>
+  </div>
 
-      <!-- Statistical Distribution Card (NumPy Powered) -->
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-        <h2 class="text-sm font-bold text-slate-900 mb-1">NumPy Statistical Summary</h2>
-        <p class="text-xs text-slate-500 mb-4">Transaction size distribution metrics</p>
-        
-        <div class="space-y-3">
-          <div class="flex justify-between items-center text-xs py-1.5 border-b border-slate-100">
-            <span class="text-slate-600">Mean Order Amount:</span>
-            <span id="stat-mean" class="font-bold text-slate-900">$0.00</span>
-          </div>
-          <div class="flex justify-between items-center text-xs py-1.5 border-b border-slate-100">
-            <span class="text-slate-600">Median Order Amount:</span>
-            <span id="stat-median" class="font-bold text-slate-900">$0.00</span>
-          </div>
-          <div class="flex justify-between items-center text-xs py-1.5 border-b border-slate-100">
-            <span class="text-slate-600">Standard Deviation:</span>
-            <span id="stat-std" class="font-bold text-slate-900">$0.00</span>
-          </div>
-          <div class="flex justify-between items-center text-xs py-1.5 border-b border-slate-100">
-            <span class="text-slate-600">25th Percentile (Q1):</span>
-            <span id="stat-q25" class="font-bold text-slate-900">$0.00</span>
-          </div>
-          <div class="flex justify-between items-center text-xs py-1.5 border-b border-slate-100">
-            <span class="text-slate-600">75th Percentile (Q3):</span>
-            <span id="stat-q75" class="font-bold text-slate-900">$0.00</span>
-          </div>
-          <div class="flex justify-between items-center text-xs py-1.5">
-            <span class="text-slate-600">Interquartile Range (IQR):</span>
-            <span id="stat-iqr" class="font-bold text-indigo-600">$0.00</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Recent Sales Table -->
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-      <div class="p-4 border-b border-slate-200 flex items-center justify-between">
+  <!-- ========================================== -->
+  <!-- MODAL: TRANSACTIONS & NUMPY STATS LEDGER -->
+  <!-- ========================================== -->
+  <div id="ledger-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-6">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-4xl w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
         <div>
-          <h2 class="text-sm font-bold text-slate-900">Recent Transactions</h2>
-          <p class="text-xs text-slate-500">Live sales ledger records</p>
+          <h3 id="ledger-title" class="text-base font-bold text-slate-900 dark:text-white">Recent Transactions Ledger</h3>
+          <p id="ledger-subtitle" class="text-xs text-slate-400">Real-time ledger audit trail and statistical metrics</p>
         </div>
-        <span class="text-xs text-slate-500 font-medium" id="table-total-count">Showing 10 records</span>
+        <button onclick="closeLedgerModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-700">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs text-slate-700">
-          <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200">
+
+      <!-- NumPy Stats Bar -->
+      <div id="numpy-stats-bar" class="grid grid-cols-2 sm:grid-cols-6 gap-2 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl shrink-0 text-center">
+        <div>
+          <p class="text-[10px] text-slate-400 font-bold uppercase">Mean</p>
+          <p id="modal-stat-mean" class="text-xs font-extrabold text-slate-800 dark:text-slate-100">$0.00</p>
+        </div>
+        <div>
+          <p class="text-[10px] text-slate-400 font-bold uppercase">Median</p>
+          <p id="modal-stat-median" class="text-xs font-extrabold text-slate-800 dark:text-slate-100">$0.00</p>
+        </div>
+        <div>
+          <p class="text-[10px] text-slate-400 font-bold uppercase">Std Dev</p>
+          <p id="modal-stat-std" class="text-xs font-extrabold text-slate-800 dark:text-slate-100">$0.00</p>
+        </div>
+        <div>
+          <p class="text-[10px] text-slate-400 font-bold uppercase">Q1 (25%)</p>
+          <p id="modal-stat-q25" class="text-xs font-extrabold text-slate-800 dark:text-slate-100">$0.00</p>
+        </div>
+        <div>
+          <p class="text-[10px] text-slate-400 font-bold uppercase">Q3 (75%)</p>
+          <p id="modal-stat-q75" class="text-xs font-extrabold text-slate-800 dark:text-slate-100">$0.00</p>
+        </div>
+        <div>
+          <p class="text-[10px] text-slate-400 font-bold uppercase">IQR</p>
+          <p id="modal-stat-iqr" class="text-xs font-extrabold text-brand-600">$0.00</p>
+        </div>
+      </div>
+
+      <!-- Transactions Table -->
+      <div class="overflow-y-auto flex-1 custom-scrollbar">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50 dark:bg-slate-800 text-slate-400 uppercase font-semibold sticky top-0">
             <tr>
-              <th class="px-4 py-3">Txn ID</th>
-              <th class="px-4 py-3">Date</th>
-              <th class="px-4 py-3">Customer</th>
-              <th class="px-4 py-3">Product</th>
-              <th class="px-4 py-3">Region</th>
-              <th class="px-4 py-3 text-right">Qty</th>
-              <th class="px-4 py-3 text-right">Revenue</th>
-              <th class="px-4 py-3 text-right">Profit</th>
-              <th class="px-4 py-3 text-center">Status</th>
+              <th class="p-3">Txn ID</th>
+              <th class="p-3">Date</th>
+              <th class="p-3">Customer</th>
+              <th class="p-3">Product</th>
+              <th class="p-3">Region</th>
+              <th class="p-3 text-right">Qty</th>
+              <th class="p-3 text-right">Revenue</th>
+              <th class="p-3 text-right">Profit</th>
+              <th class="p-3 text-center">Status</th>
             </tr>
           </thead>
-          <tbody id="sales-table-body" class="divide-y divide-slate-100">
-            <tr>
-              <td colspan="9" class="px-4 py-8 text-center text-slate-400">Loading transactions...</td>
-            </tr>
+          <tbody id="modal-transactions-body" class="divide-y divide-slate-100 dark:divide-slate-800">
+            <tr><td colspan="9" class="p-6 text-center text-slate-400">Loading records...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
+  </div>
 
-  </main>
-
-  <!-- Upload Modal -->
+  <!-- ========================================== -->
+  <!-- MODAL: DATASET INGEST (CSV/EXCEL) -->
+  <!-- ========================================== -->
   <div id="upload-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
       <div class="flex items-center justify-between">
-        <h3 class="text-base font-bold text-slate-900">Ingest Sales Dataset</h3>
-        <button onclick="closeUploadModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+        <h3 class="text-sm font-bold text-slate-900 dark:text-white">Ingest Sales Dataset</h3>
+        <button onclick="closeUploadModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <p class="text-xs text-slate-500">
-        Upload a <strong>CSV (.csv)</strong> or <strong>Excel (.xlsx)</strong> dataset. The engine will clean data types, normalize headers, and skip duplicates automatically.
+        Upload a <strong>CSV (.csv)</strong> or <strong>Excel (.xlsx)</strong> dataset. The engine will clean data types, normalize headers, and deduplicate records automatically.
       </p>
 
       <form id="upload-form" onsubmit="handleUploadSubmit(event)" class="space-y-4">
-        <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-brand-500 transition cursor-pointer" onclick="document.getElementById('file-input').click()">
+        <div class="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-6 text-center hover:border-brand-500 transition cursor-pointer" onclick="document.getElementById('file-input').click()">
           <i class="fa-solid fa-cloud-arrow-up text-3xl text-brand-600 mb-2"></i>
-          <p id="file-label" class="text-xs font-semibold text-slate-700">Click to browse or drop CSV/Excel here</p>
-          <p class="text-[10px] text-slate-400 mt-1">Supports sample_sales.csv and sample_sales.xlsx</p>
-          <input type="file" id="file-input" name="file" accept=".csv, .xlsx, .xls" class="hidden" onchange="updateFileLabel()">
+          <p id="file-label" class="text-xs font-semibold text-slate-700 dark:text-slate-300">Click to browse or drop CSV/Excel here</p>
+          <input type="file" id="file-input" accept=".csv, .xlsx, .xls" class="hidden" onchange="updateFileLabel()">
         </div>
 
-        <div id="upload-result" class="text-xs p-3 rounded-lg hidden"></div>
+        <div id="upload-result" class="hidden text-xs p-3 rounded-xl"></div>
 
-        <div class="flex justify-end space-x-2 pt-2">
-          <button type="button" onclick="closeUploadModal()" class="px-3.5 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 rounded-lg">Cancel</button>
-          <button type="submit" id="upload-btn" class="px-4 py-1.5 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition">Upload & Process</button>
+        <div class="flex items-center justify-end space-x-2">
+          <button type="button" onclick="closeUploadModal()" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100">Cancel</button>
+          <button type="submit" id="upload-btn" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-md transition">Upload & Process</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Client-side Business Intelligence Application Logic -->
+  <!-- ========================================== -->
+  <!-- JAVASCRIPT: APPLICATION LOGIC -->
+  <!-- ========================================== -->
   <script>
     let authToken = localStorage.getItem("access_token") || null;
-    let monthlyChart = null;
-    let regionalChart = null;
-    let productsChart = null;
+    let splineChart = null;
+    let donutChart = null;
+    let overviewCache = null;
 
-    // 1. Authenticate with backend API automatically (with auto-seed fallback)
+    // Brand product icon mapping helper
+    function getProductIcon(name, category) {
+      const lower = (name + ' ' + (category || '')).toLowerCase();
+      if (lower.includes('shoe') || lower.includes('nike') || lower.includes('jordan')) return 'fa-shoe-prints';
+      if (lower.includes('laptop') || lower.includes('macbook') || lower.includes('dell')) return 'fa-laptop';
+      if (lower.includes('phone') || lower.includes('iphone') || lower.includes('samsung')) return 'fa-mobile-screen-button';
+      if (lower.includes('echo') || lower.includes('speaker') || lower.includes('audio')) return 'fa-volume-high';
+      if (lower.includes('watch')) return 'fa-stopwatch';
+      if (lower.includes('desk') || lower.includes('chair') || lower.includes('office')) return 'fa-chair';
+      return 'fa-box';
+    }
+
+    // 1. Silent JWT Authentication
     async function ensureAuth() {
       try {
         let res = await fetch("/api/v1/auth/login", {
@@ -357,10 +647,7 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: "admin@company.com", password: "AdminPass123!" })
         });
-        
-        // If login failed (e.g. fresh database without seeded admin)
         if (!res.ok) {
-          console.log("Admin account not found. Seeding initial database...");
           await fetch("/api/v1/seed", { method: "POST" });
           res = await fetch("/api/v1/auth/login", {
             method: "POST",
@@ -368,13 +655,10 @@
             body: JSON.stringify({ email: "admin@company.com", password: "AdminPass123!" })
           });
         }
-
         if (res.ok) {
           const data = await res.json();
           authToken = data.access_token;
           localStorage.setItem("access_token", authToken);
-          document.getElementById("api-status").className = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800";
-          document.getElementById("api-status").innerHTML = `<span class="w-2 h-2 mr-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Connected`;
         }
       } catch (e) {
         console.warn("Auth check failed:", e);
@@ -385,307 +669,301 @@
       return authToken ? { "Authorization": `Bearer ${authToken}` } : {};
     }
 
-    // Manual Seed Trigger
-    async function triggerManualSeed() {
-      const btn = document.getElementById("seed-btn");
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Seeding...`;
+    // 2. Fetch Consolidated Overview Data
+    async function loadDashboardData() {
+      const startDate = document.getElementById("start-date").value.trim();
+      const endDate = document.getElementById("end-date").value.trim();
+      const region = document.getElementById("region-filter").value.trim();
+
+      // Background auth
+      ensureAuth();
+
+      const params = new URLSearchParams();
+      if (startDate) params.append("start_date", startDate);
+      if (endDate) params.append("end_date", endDate);
+      if (region) params.append("region", region);
+
+      // Update active filters badge
+      let activeCount = 0;
+      if (startDate) activeCount++;
+      if (endDate) activeCount++;
+      if (region) activeCount++;
+
+      const badge = document.getElementById("active-filter-badge");
+      if (activeCount > 0) {
+        badge.innerText = activeCount;
+        badge.classList.remove("hidden");
+      } else {
+        badge.classList.add("hidden");
       }
+
       try {
-        const res = await fetch("/api/v1/seed", { method: "POST" });
-        const json = await res.json();
-        localStorage.removeItem("access_token");
-        authToken = null;
-        await ensureAuth();
-        await loadDashboardData();
-        alert("Success! 200+ historical multi-year records and default accounts seeded.");
+        const res = await fetch(`/api/v1/dashboard/overview?${params.toString()}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        overviewCache = data;
+
+        // Set min/max on date inputs if bounds exist
+        if (data.date_bounds) {
+          const sInput = document.getElementById("start-date");
+          const eInput = document.getElementById("end-date");
+          if (!sInput.min && data.date_bounds.min_date) sInput.min = data.date_bounds.min_date;
+          if (!sInput.max && data.date_bounds.max_date) sInput.max = data.date_bounds.max_date;
+          if (!eInput.min && data.date_bounds.min_date) eInput.min = data.date_bounds.min_date;
+          if (!eInput.max && data.date_bounds.max_date) eInput.max = data.date_bounds.max_date;
+        }
+
+        // Subtitle status label
+        const statusLabel = document.getElementById("filter-status-label");
+        if (region || (startDate && endDate)) {
+          statusLabel.innerHTML = `Active Filters: ${region ? 'Region: <strong>' + region + '</strong>' : ''} ${startDate ? ' (' + startDate + ' to ' + endDate + ')' : ''}`;
+        } else {
+          statusLabel.innerText = "Your Total Analytics Report Observe Stat";
+        }
+
+        renderMetrics(data);
+        renderSplineChart(data.monthly_trends || []);
+        renderBestProducts(data.top_products || []);
+        renderDonut(data.regional_performance || [], data.kpis ? data.kpis.total_revenue : 0);
+        renderLedger(data);
+
       } catch (err) {
-        alert("Seed failed: " + err.message);
-      } finally {
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = `<i class="fa-solid fa-database mr-1.5 text-indigo-600"></i> Seed 200+ Demo Records`;
-        }
+        console.error("Dashboard overview error:", err);
       }
     }
 
-    // 2. Fetch and render KPIs
-    async function loadKPIs(startDate, endDate, region) {
-      let url = `/api/v1/analytics/summary?`;
-      if (startDate) url += `start_date=${startDate}&`;
-      if (endDate) url += `end_date=${endDate}&`;
-      if (region) url += `region=${encodeURIComponent(region)}&`;
+    // 3. Render Metric Cards
+    function renderMetrics(data) {
+      const k = data.kpis || {};
+      const rev = k.total_revenue || 0;
+      const orders = k.total_orders || 0;
+      const margin = k.gross_profit_margin_percent || 0;
+      const aov = k.average_order_value || 0;
 
-      const res = await fetch(url, { headers: authHeaders() });
-      if (res.ok) {
-        const json = await res.json();
-        const d = json.data;
-        document.getElementById("kpi-revenue").innerText = `$${d.total_revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-        document.getElementById("kpi-profit").innerText = `$${d.total_profit.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-        document.getElementById("kpi-margin").innerText = `${d.gross_profit_margin_percent.toFixed(1)}%`;
-        document.getElementById("kpi-units").innerText = d.total_units_sold.toLocaleString();
-        document.getElementById("kpi-orders").innerText = d.total_orders.toLocaleString();
-        document.getElementById("kpi-aov").innerText = `$${d.average_order_value.toFixed(2)}`;
-
-        // If revenue is 0 on all-time initial load, trigger auto-seed once
-        if (d.total_revenue === 0 && !startDate && !endDate && !region) {
-          console.log("Empty dataset detected on initial view. Auto-populating...");
-          await fetch("/api/v1/seed", { method: "POST" });
-          await ensureAuth();
-          // Reload once
-          const retryRes = await fetch(url, { headers: authHeaders() });
-          if (retryRes.ok) {
-            const retryJson = await retryRes.json();
-            const rd = retryJson.data;
-            document.getElementById("kpi-revenue").innerText = `$${rd.total_revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-            document.getElementById("kpi-profit").innerText = `$${rd.total_profit.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-            document.getElementById("kpi-margin").innerText = `${rd.gross_profit_margin_percent.toFixed(1)}%`;
-            document.getElementById("kpi-units").innerText = rd.total_units_sold.toLocaleString();
-            document.getElementById("kpi-orders").innerText = rd.total_orders.toLocaleString();
-            document.getElementById("kpi-aov").innerText = `$${rd.average_order_value.toFixed(2)}`;
-          }
-        }
-      }
+      document.getElementById("kpi-revenue").innerText = `$${rev.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+      document.getElementById("headline-revenue").innerText = `$${rev.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      document.getElementById("kpi-orders").innerText = orders.toLocaleString();
+      document.getElementById("kpi-margin").innerText = `${margin.toFixed(1)}%`;
+      document.getElementById("kpi-aov").innerText = `$${aov.toFixed(2)}`;
     }
 
-    // 3. Monthly Trends Chart (MoM %)
-    async function loadMonthlyTrends(startDate, endDate, region) {
-      let url = `/api/v1/analytics/trends/monthly?`;
-      if (startDate) url += `start_date=${startDate}&`;
-      if (endDate) url += `end_date=${endDate}&`;
-      if (region) url += `region=${encodeURIComponent(region)}&`;
+    // 4. Render Smooth Spline Curve Chart
+    function renderSplineChart(trends) {
+      const isDark = document.documentElement.classList.contains("dark");
+      const records = Array.isArray(trends) && trends.length > 0 ? trends : [];
 
-      const res = await fetch(url, { headers: authHeaders() });
-      if (!res.ok) return;
-      const json = await res.json();
-      const records = json.data;
+      const labels = records.map(r => {
+        const parts = (r.period || '').split('-');
+        if (parts.length === 2) {
+          const dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, 1);
+          return dateObj.toLocaleString('en-US', { month: 'short' });
+        }
+        return r.period;
+      });
 
-      const labels = records.map(r => r.period);
       const revenues = records.map(r => r.revenue);
-      const profits = records.map(r => r.profit);
 
-      const ctx = document.getElementById("monthlyTrendChart").getContext("2d");
-      if (monthlyChart) monthlyChart.destroy();
+      const ctx = document.getElementById("revenueSplineChart").getContext("2d");
+      if (splineChart) splineChart.destroy();
 
-      monthlyChart = new Chart(ctx, {
-        type: "bar",
+      // Create gradient fill
+      const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+      gradient.addColorStop(0, 'rgba(99, 102, 241, 0.28)');
+      gradient.addColorStop(1, 'rgba(99, 102, 241, 0.00)');
+
+      splineChart = new Chart(ctx, {
+        type: 'line',
         data: {
-          labels: labels,
-          datasets: [
-            {
-              label: "Revenue ($)",
-              data: revenues,
-              backgroundColor: "rgba(99, 102, 241, 0.8)",
-              borderRadius: 6,
-            },
-            {
-              label: "Profit ($)",
-              data: profits,
-              backgroundColor: "rgba(16, 185, 129, 0.8)",
-              borderRadius: 6,
-            }
-          ]
+          labels: labels.length > 0 ? labels : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+          datasets: [{
+            label: 'Total Revenue',
+            data: revenues.length > 0 ? revenues : [20000, 45000, 30000, 48000, 32000, 52000, 31000, 18000, 49000, 36000, 22000, 41000],
+            borderColor: '#6366f1',
+            borderWidth: 3,
+            fill: true,
+            backgroundColor: gradient,
+            tension: 0.45, // Spline smooth curve
+            pointRadius: 0,
+            pointHoverRadius: 6,
+            pointHoverBackgroundColor: '#4f46e5',
+            pointHoverBorderColor: '#ffffff',
+            pointHoverBorderWidth: 2,
+          }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { position: "top", labels: { boxWidth: 12, font: { size: 11 } } },
+            legend: { display: false },
             tooltip: {
+              backgroundColor: '#4f46e5',
+              titleFont: { size: 10, weight: 'bold' },
+              bodyFont: { size: 11 },
+              padding: 10,
+              cornerRadius: 12,
+              displayColors: false,
               callbacks: {
-                afterLabel: function(ctx) {
-                  const idx = ctx.dataIndex;
-                  return `MoM Growth: ${records[idx].mom_revenue_growth_percent}%`;
+                label: function(ctx) {
+                  return `Total Earned: $${ctx.parsed.y.toLocaleString()}`;
                 }
               }
             }
           },
           scales: {
-            y: { grid: { color: "#f1f5f9" }, ticks: { font: { size: 10 } } },
-            x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+            x: {
+              grid: { display: false },
+              ticks: {
+                color: isDark ? '#94a3b8' : '#94a3b8',
+                font: { size: 10, family: 'Plus Jakarta Sans', weight: '500' }
+              }
+            },
+            y: {
+              display: false,
+              grid: { display: false }
+            }
           }
         }
       });
     }
 
-    // 4. Regional Share Donut Chart
-    async function loadRegionalShare(startDate, endDate, region) {
-      let url = `/api/v1/analytics/regions?`;
-      if (startDate) url += `start_date=${startDate}&`;
-      if (endDate) url += `end_date=${endDate}&`;
-      if (region) url += `region=${encodeURIComponent(region)}&`;
-
-      const res = await fetch(url, { headers: authHeaders() });
-      if (!res.ok) return;
-      const json = await res.json();
-      const regions = json.data;
-
-      const labels = regions.map(r => r.region);
-      const values = regions.map(r => r.total_revenue);
-
-      const ctx = document.getElementById("regionalChart").getContext("2d");
-      if (regionalChart) regionalChart.destroy();
-
-      regionalChart = new Chart(ctx, {
-        type: "doughnut",
-        data: {
-          labels: labels,
-          datasets: [{
-            data: values,
-            backgroundColor: [
-              "#6366f1", "#10b981", "#f59e0b", "#38bdf8", "#ec4899", "#8b5cf6"
-            ],
-            borderWidth: 2,
-            borderColor: "#ffffff"
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: "bottom", labels: { boxWidth: 10, font: { size: 10 } } }
-          },
-          cutout: "70%"
-        }
-      });
-    }
-
-    // 5. Top Products Chart
-    async function loadTopProducts(startDate, endDate, region) {
-      let url = `/api/v1/analytics/products/top?limit=5&`;
-      if (startDate) url += `start_date=${startDate}&`;
-      if (endDate) url += `end_date=${endDate}&`;
-      if (region) url += `region=${encodeURIComponent(region)}&`;
-
-      const res = await fetch(url, { headers: authHeaders() });
-      if (!res.ok) return;
-      const json = await res.json();
-      const products = json.data;
-
-      const labels = products.map(p => p.name.length > 20 ? p.name.substring(0, 18) + '...' : p.name);
-      const revenues = products.map(p => p.total_revenue);
-
-      const ctx = document.getElementById("productsChart").getContext("2d");
-      if (productsChart) productsChart.destroy();
-
-      productsChart = new Chart(ctx, {
-        type: "bar",
-        indexAxis: "y",
-        data: {
-          labels: labels,
-          datasets: [{
-            label: "Total Sales ($)",
-            data: revenues,
-            backgroundColor: "#4f46e5",
-            borderRadius: 6
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false }
-          },
-          scales: {
-            x: { grid: { color: "#f1f5f9" }, ticks: { font: { size: 10 } } },
-            y: { grid: { display: false }, ticks: { font: { size: 10 } } }
-          }
-        }
-      });
-    }
-
-    // 6. NumPy Distribution Stats
-    async function loadNumPyStats(startDate, endDate, region) {
-      let url = `/api/v1/analytics/stats?`;
-      if (startDate) url += `start_date=${startDate}&`;
-      if (endDate) url += `end_date=${endDate}&`;
-      if (region) url += `region=${encodeURIComponent(region)}&`;
-
-      const res = await fetch(url, { headers: authHeaders() });
-      if (!res.ok) return;
-      const json = await res.json();
-      const s = json.data;
-
-      document.getElementById("stat-mean").innerText = `$${s.revenue.mean.toFixed(2)}`;
-      document.getElementById("stat-median").innerText = `$${s.revenue.median.toFixed(2)}`;
-      document.getElementById("stat-std").innerText = `$${s.revenue.std_dev.toFixed(2)}`;
-      document.getElementById("stat-q25").innerText = `$${s.revenue.q25.toFixed(2)}`;
-      document.getElementById("stat-q75").innerText = `$${s.revenue.q75.toFixed(2)}`;
-      document.getElementById("stat-iqr").innerText = `$${s.revenue.iqr.toFixed(2)}`;
-    }
-
-    // 7. Recent Transactions Table
-    async function loadTransactions(startDate, endDate, region) {
-      let url = `/api/v1/sales?per_page=10&`;
-      if (startDate) url += `start_date=${startDate}&`;
-      if (endDate) url += `end_date=${endDate}&`;
-      if (region) url += `region=${encodeURIComponent(region)}&`;
-
-      const res = await fetch(url, { headers: authHeaders() });
-      if (!res.ok) return;
-      const json = await res.json();
-      const sales = json.items;
-
-      document.getElementById("table-total-count").innerText = `Total Records: ${json.pagination.total_items}`;
-
-      const tbody = document.getElementById("sales-table-body");
-      if (sales.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-6 text-center text-slate-400">No transactions found matching the selected filters.</td></tr>`;
+    // 5. Render Best Selling Products Table
+    function renderBestProducts(products) {
+      const tbody = document.getElementById("best-products-body");
+      if (!products || products.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">No products available.</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = sales.map(s => `
-        <tr class="hover:bg-slate-50 transition">
-          <td class="px-4 py-2.5 font-mono font-medium text-slate-900">${s.transaction_id}</td>
-          <td class="px-4 py-2.5 text-slate-500">${s.sale_date}</td>
-          <td class="px-4 py-2.5 font-medium text-slate-800">${s.customer ? s.customer.name : 'Unknown'}</td>
-          <td class="px-4 py-2.5 text-slate-600">${s.product ? s.product.name : 'Unknown'}</td>
-          <td class="px-4 py-2.5"><span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-semibold">${s.region}</span></td>
-          <td class="px-4 py-2.5 text-right font-medium">${s.quantity}</td>
-          <td class="px-4 py-2.5 text-right font-bold text-slate-900">$${s.total_revenue.toFixed(2)}</td>
-          <td class="px-4 py-2.5 text-right font-semibold text-emerald-600">+$${s.total_profit.toFixed(2)}</td>
-          <td class="px-4 py-2.5 text-center">
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${s.status === 'Completed' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-              ${s.status}
+      tbody.innerHTML = products.slice(0, 6).map((p, index) => {
+        const icon = getProductIcon(p.name, p.category);
+        const qty = p.units_sold || 0;
+        const totalRev = p.total_revenue || 0;
+        const unitPrice = qty > 0 ? (totalRev / qty) : 0;
+        const brand = p.category || 'Standard';
+
+        return `
+          <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition">
+            <td class="py-3 flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-700/60 flex items-center justify-center text-slate-600 dark:text-slate-300 shrink-0">
+                <i class="fa-solid ${icon} text-xs"></i>
+              </div>
+              <span class="font-bold text-slate-800 dark:text-white line-clamp-1">${p.name}</span>
+            </td>
+            <td class="py-3 text-slate-400 font-medium">${brand}</td>
+            <td class="py-3 text-center font-bold text-slate-800 dark:text-white">${qty.toLocaleString()}</td>
+            <td class="py-3 text-right font-medium text-slate-500 dark:text-slate-400">$${unitPrice.toFixed(2)}</td>
+            <td class="py-3 text-right font-bold text-slate-900 dark:text-white">$${totalRev.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // 6. Render Total Selling Source Donut Chart
+    function renderDonut(regions, totalRev) {
+      const records = Array.isArray(regions) && regions.length > 0 ? regions : [];
+      const labels = records.map(r => r.region);
+      const values = records.map(r => r.total_revenue);
+
+      const colors = ['#6366f1', '#06b6d4', '#3b82f6', '#f59e0b', '#10b981', '#8b5cf6'];
+
+      // Donut Center Text
+      document.getElementById("donut-center-revenue").innerText = `$${(totalRev / 1000).toFixed(1)}k`;
+
+      const ctx = document.getElementById("sellingSourceDonut").getContext("2d");
+      if (donutChart) donutChart.destroy();
+
+      donutChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels.length > 0 ? labels : ['Central', 'North', 'South', 'West'],
+          datasets: [{
+            data: values.length > 0 ? values : [40, 27.4, 20, 12.6],
+            backgroundColor: colors,
+            borderWidth: 3,
+            borderColor: document.documentElement.classList.contains("dark") ? '#1e293b' : '#ffffff',
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '74%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              cornerRadius: 10,
+              padding: 8,
+              callbacks: {
+                label: function(ctx) {
+                  return ` ${ctx.label}: $${ctx.parsed.toLocaleString()}`;
+                }
+              }
+            }
+          }
+        }
+      });
+
+      // Render Donut Legend
+      const legendBox = document.getElementById("selling-source-legend");
+      legendBox.innerHTML = records.slice(0, 4).map((r, i) => `
+        <div class="flex items-center space-x-2">
+          <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${colors[i % colors.length]}"></span>
+          <div class="flex items-baseline space-x-1.5">
+            <span class="font-bold text-slate-800 dark:text-white">${r.region}:</span>
+            <span class="text-slate-400 font-semibold">$${(r.total_revenue / 1000).toFixed(1)}k</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 7. Render Ledger Modal (Transactions + NumPy stats)
+    function renderLedger(data) {
+      const s = data.stats ? data.stats.revenue : {};
+      document.getElementById("modal-stat-mean").innerText = `$${(s.mean || 0).toFixed(2)}`;
+      document.getElementById("modal-stat-median").innerText = `$${(s.median || 0).toFixed(2)}`;
+      document.getElementById("modal-stat-std").innerText = `$${(s.std_dev || 0).toFixed(2)}`;
+      document.getElementById("modal-stat-q25").innerText = `$${(s.q25 || 0).toFixed(2)}`;
+      document.getElementById("modal-stat-q75").innerText = `$${(s.q75 || 0).toFixed(2)}`;
+      document.getElementById("modal-stat-iqr").innerText = `$${(s.iqr || 0).toFixed(2)}`;
+
+      const items = (data.transactions && data.transactions.items) ? data.transactions.items : [];
+      const tbody = document.getElementById("modal-transactions-body");
+      if (items.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-slate-400">No records found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = items.map(t => `
+        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+          <td class="p-3 font-mono font-bold text-slate-900 dark:text-white">${t.transaction_id}</td>
+          <td class="p-3 text-slate-400">${t.sale_date}</td>
+          <td class="p-3 font-semibold text-slate-800 dark:text-slate-200">${t.customer ? t.customer.name : 'Unknown'}</td>
+          <td class="p-3 text-slate-600 dark:text-slate-300">${t.product ? t.product.name : 'Unknown'}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] font-bold">${t.region}</span></td>
+          <td class="p-3 text-right font-bold">${t.quantity}</td>
+          <td class="p-3 text-right font-extrabold text-slate-900 dark:text-white">$${(t.total_revenue || 0).toFixed(2)}</td>
+          <td class="p-3 text-right font-bold text-emerald-500">+$${(t.total_profit || 0).toFixed(2)}</td>
+          <td class="p-3 text-center">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${t.status === 'Completed' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-amber-100 text-amber-800'}">
+              ${t.status}
             </span>
           </td>
         </tr>
       `).join('');
     }
 
-    // Master loader with filter state management
-    async function loadDashboardData() {
-      const startDate = document.getElementById("start-date").value;
-      const endDate = document.getElementById("end-date").value;
-      const region = document.getElementById("region-filter").value;
+    // Modal & Popover Controls
+    function toggleFilterPopover() {
+      const popover = document.getElementById("filter-popover");
+      popover.classList.toggle("hidden");
+    }
 
-      // Update Filter Banner text
-      const bannerText = document.getElementById("filter-summary-text");
-      const activeFilters = [];
-      if (region) activeFilters.push(`Region: <strong>${region}</strong>`);
-      if (startDate && endDate) activeFilters.push(`Between <strong>${startDate}</strong> and <strong>${endDate}</strong>`);
-      else if (startDate) activeFilters.push(`From <strong>${startDate}</strong> onwards`);
-      else if (endDate) activeFilters.push(`Up to <strong>${endDate}</strong>`);
-
-      if (activeFilters.length > 0) {
-        bannerText.innerHTML = `Active Filters applied: ${activeFilters.join(" &bull; ")}`;
-      } else {
-        bannerText.innerHTML = `Displaying all-time historical sales data across all regions.`;
-      }
-
-      await ensureAuth();
-      await Promise.all([
-        loadKPIs(startDate, endDate, region),
-        loadMonthlyTrends(startDate, endDate, region),
-        loadRegionalShare(startDate, endDate, region),
-        loadTopProducts(startDate, endDate, region),
-        loadNumPyStats(startDate, endDate, region),
-        loadTransactions(startDate, endDate, region),
-      ]);
+    function toggleExportDropdown() {
+      const dd = document.getElementById("export-dropdown");
+      dd.classList.toggle("hidden");
     }
 
     function applyFilters() {
+      toggleFilterPopover();
       loadDashboardData();
     }
 
@@ -693,35 +971,24 @@
       document.getElementById("start-date").value = "";
       document.getElementById("end-date").value = "";
       document.getElementById("region-filter").value = "";
+      toggleFilterPopover();
       loadDashboardData();
     }
 
-    // Export handler
-    function exportReport(format) {
-      const startDate = document.getElementById("start-date").value;
-      const endDate = document.getElementById("end-date").value;
-      const region = document.getElementById("region-filter").value;
-
-      let url = format === 'excel' ? '/api/v1/reports/export/excel?' : '/api/v1/reports/export/csv?';
-      if (startDate) url += `start_date=${startDate}&`;
-      if (endDate) url += `end_date=${endDate}&`;
-      if (region) url += `region=${encodeURIComponent(region)}&`;
-
-      fetch(url, { headers: authHeaders() })
-        .then(res => res.blob())
-        .then(blob => {
-          const downloadUrl = window.URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = downloadUrl;
-          a.download = format === 'excel' ? `sales_bi_report_${Date.now()}.xlsx` : `sales_export_${Date.now()}.csv`;
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-        })
-        .catch(err => alert("Error downloading report: " + err));
+    function openLedgerModal(mode) {
+      const modal = document.getElementById("ledger-modal");
+      const title = document.getElementById("ledger-title");
+      if (mode === 'customer') title.innerText = "Customer Transaction Frequency & Spend";
+      else if (mode === 'product') title.innerText = "Product Inventory & Sales Audit";
+      else if (mode === 'stats') title.innerText = "NumPy Statistical Distribution of Sales";
+      else title.innerText = "Recent Sales Transactions Ledger";
+      modal.classList.remove("hidden");
     }
 
-    // Upload Modal functions
+    function closeLedgerModal() {
+      document.getElementById("ledger-modal").classList.add("hidden");
+    }
+
     function openUploadModal() {
       document.getElementById("upload-modal").classList.remove("hidden");
     }
@@ -738,6 +1005,52 @@
       }
     }
 
+    // Export Trigger
+    function triggerExport(format) {
+      toggleExportDropdown();
+      const s = document.getElementById("start-date").value.trim();
+      const e = document.getElementById("end-date").value.trim();
+      const r = document.getElementById("region-filter").value.trim();
+
+      let url = format === 'excel' ? '/api/v1/reports/export/excel?' : '/api/v1/reports/export/csv?';
+      if (s) url += `start_date=${s}&`;
+      if (e) url += `end_date=${e}&`;
+      if (r) url += `region=${encodeURIComponent(r)}&`;
+
+      fetch(url, { headers: authHeaders() })
+        .then(async res => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.blob();
+        })
+        .then(blob => {
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = downloadUrl;
+          a.download = format === 'excel' ? `sales_bi_report_${Date.now()}.xlsx` : `sales_export_${Date.now()}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        })
+        .catch(err => alert("Error downloading report: " + err.message));
+    }
+
+    // Seed Data Trigger
+    async function triggerManualSeed() {
+      const btn = document.getElementById("seed-btn");
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-brand-600"></i> Seeding...`;
+      try {
+        await fetch("/api/v1/seed", { method: "POST" });
+        await ensureAuth();
+        await loadDashboardData();
+        alert("Success! 227 demo sales records and catalog seeded.");
+      } catch (e) {
+        alert("Seed failed: " + e.message);
+      } finally {
+        btn.innerHTML = `<i class="fa-solid fa-database text-slate-400"></i> <span>Re-seed 227 Records</span>`;
+      }
+    }
+
+    // Upload Dataset Handler
     async function handleUploadSubmit(e) {
       e.preventDefault();
       const fileInput = document.getElementById("file-input");
@@ -749,7 +1062,7 @@
       const btn = document.getElementById("upload-btn");
       const resultBox = document.getElementById("upload-result");
       btn.disabled = true;
-      btn.innerText = "Processing Dataset...";
+      btn.innerText = "Processing...";
 
       const formData = new FormData();
       formData.append("file", fileInput.files[0]);
@@ -761,27 +1074,20 @@
           body: formData
         });
         const json = await res.json();
-
         resultBox.classList.remove("hidden");
         if (res.ok) {
-          resultBox.className = "text-xs p-3 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 block";
-          resultBox.innerHTML = `
-            <strong>Success!</strong> ${json.message}<br>
-            • Inserted: ${json.statistics.inserted_records}<br>
-            • Duplicates Skipped: ${json.statistics.in_batch_duplicates_skipped + json.statistics.db_duplicates_skipped}<br>
-            • New Customers: ${json.statistics.new_customers_created || 0}<br>
-            • New Products: ${json.statistics.new_products_created || 0}
-          `;
+          resultBox.className = "text-xs p-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 block";
+          resultBox.innerHTML = `<strong>Success!</strong> ${json.message}<br>Inserted: ${json.statistics.inserted_records}`;
           setTimeout(() => {
             loadDashboardData();
             closeUploadModal();
-          }, 3000);
+          }, 2500);
         } else {
-          resultBox.className = "text-xs p-3 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 block";
-          resultBox.innerHTML = `<strong>Upload Failed:</strong> ${json.error ? json.error.message : 'Unknown error'}`;
+          resultBox.className = "text-xs p-3 rounded-xl bg-rose-50 text-rose-800 border border-rose-200 block";
+          resultBox.innerHTML = `<strong>Failed:</strong> ${json.error ? json.error.message : 'Unknown'}`;
         }
       } catch (err) {
-        resultBox.className = "text-xs p-3 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 block";
+        resultBox.className = "text-xs p-3 rounded-xl bg-rose-50 text-rose-800 border border-rose-200 block";
         resultBox.innerText = `Network error: ${err.message}`;
       } finally {
         btn.disabled = false;
@@ -789,7 +1095,58 @@
       }
     }
 
-    // Initialize on page load
+    // Theme Switcher
+    function setTheme(theme) {
+      const html = document.documentElement;
+      const lBtn = document.getElementById("theme-light-btn");
+      const dBtn = document.getElementById("theme-dark-btn");
+
+      if (theme === 'dark') {
+        html.classList.add("dark");
+        dBtn.className = "flex-1 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 bg-slate-700 text-white shadow-sm transition";
+        lBtn.className = "flex-1 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 text-slate-400 hover:text-slate-600 transition";
+      } else {
+        html.classList.remove("dark");
+        lBtn.className = "flex-1 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 bg-white text-slate-900 shadow-sm transition";
+        dBtn.className = "flex-1 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white transition";
+      }
+      if (splineChart) renderSplineChart(overviewCache ? overviewCache.monthly_trends : []);
+      if (donutChart) renderDonut(overviewCache ? overviewCache.regional_performance : [], overviewCache && overviewCache.kpis ? overviewCache.kpis.total_revenue : 0);
+    }
+
+    function switchTab(tab) {
+      if (tab === 'analytics') {
+        document.getElementById("nav-analytics").className = "flex items-center space-x-3.5 px-4 py-3 rounded-2xl bg-brand-600 text-white shadow-md shadow-brand-500/25 transition";
+        document.getElementById("nav-dashboard").className = "flex items-center space-x-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-100/70 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition";
+      }
+    }
+
+    // Search filter helper
+    function handleSearch(term) {
+      if (!overviewCache || !overviewCache.top_products) return;
+      const q = term.toLowerCase().trim();
+      const filtered = overviewCache.top_products.filter(p => 
+        p.name.toLowerCase().includes(q) || (p.category && p.category.toLowerCase().includes(q))
+      );
+      renderBestProducts(filtered);
+    }
+
+    // Close popovers on click outside
+    document.addEventListener("click", (e) => {
+      const fBtn = document.getElementById("filter-toggle-btn");
+      const fPop = document.getElementById("filter-popover");
+      if (fPop && !fPop.classList.contains("hidden") && !fPop.contains(e.target) && !fBtn.contains(e.target)) {
+        fPop.classList.add("hidden");
+      }
+
+      const expBtn = document.getElementById("export-toggle-btn");
+      const expDropdown = document.getElementById("export-dropdown");
+      if (expDropdown && !expDropdown.classList.contains("hidden") && !expDropdown.contains(e.target) && !expBtn.contains(e.target)) {
+        expDropdown.classList.add("hidden");
+      }
+    });
+
+    // Initialize on load
     window.addEventListener("DOMContentLoaded", () => {
       loadDashboardData();
     });

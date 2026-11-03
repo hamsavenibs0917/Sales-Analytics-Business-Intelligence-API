@@ -91,6 +91,12 @@ def create_app(config_name=None):
                 "error": str(e)
             }), 500
 
+    @app.route("/api/v1/dashboard/overview", methods=["GET"])
+    def dashboard_overview():
+        """Consolidated Dashboard Overview Endpoint."""
+        from app.api.analytics import get_dashboard_overview
+        return get_dashboard_overview()
+
     @app.route("/api/v1/openapi.json", methods=["GET"])
     def openapi_spec():
         """Serve the OpenAPI 3.0 specification."""

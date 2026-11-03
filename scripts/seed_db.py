@@ -18,10 +18,16 @@ from app.models.customer import Customer
 from app.models.product import Product
 from app.models.sale import Sale
 
-def seed_database():
-    app = create_app("development")
+def seed_database(target_app=None):
+    from flask import current_app
+    app_to_use = target_app
+    if app_to_use is None:
+        try:
+            app_to_use = current_app._get_current_object()
+        except RuntimeError:
+            app_to_use = create_app(os.getenv("FLASK_ENV", "development"))
 
-    with app.app_context():
+    with app_to_use.app_context():
         print("Creating all database tables...")
         db.create_all()
 

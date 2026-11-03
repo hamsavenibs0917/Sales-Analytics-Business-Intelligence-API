@@ -103,3 +103,30 @@ def test_summary_statistics(client, user_headers):
     assert "median" in stats["revenue"]
     assert "std_dev" in stats["revenue"]
     assert "iqr" in stats["revenue"]
+
+
+def test_dashboard_overview_endpoint(client):
+    """Test consolidated overview endpoint with date and region filters."""
+    setup_analytics_data()
+
+    # All-time overview
+    res = client.get("/api/v1/dashboard/overview")
+    assert res.status_code == 200
+    data = res.get_json()
+    assert data["success"] is True
+    assert "kpis" in data
+    assert "monthly_trends" in data
+    assert "regional_performance" in data
+    assert "top_products" in data
+    assert "stats" in data
+    assert "transactions" in data
+    assert data["transactions"]["total_items"] >= 3
+
+    # Filtered overview by region
+    res_filtered = client.get("/api/v1/dashboard/overview?region=North")
+    assert res_filtered.status_code == 200
+    d_filtered = res_filtered.get_json()
+    assert d_filtered["filters"]["region"] == "North"
+    for r in d_filtered["regional_performance"]:
+        assert r["region"] == "North"
+

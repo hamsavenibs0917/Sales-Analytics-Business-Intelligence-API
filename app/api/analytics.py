@@ -140,3 +140,68 @@ def get_summary_statistics():
         "success": True,
         "data": stats
     }), 200
+
+
+@analytics_bp.route("/overview", methods=["GET"])
+def get_dashboard_overview():
+    """
+    Consolidated Dashboard Overview Endpoint.
+    Returns KPIs, Monthly Trends, Regional Performance, Top Products, NumPy stats,
+    and recent transactions in a single payload. Auto-seeds if database is empty.
+    """
+    from sqlalchemy import func
+    from app.extensions import db
+
+    # Auto-seed if database is empty
+    if Sale.query.count() == 0:
+        from scripts.seed_db import seed_database
+        try:
+            seed_database()
+        except Exception:
+            pass
+
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+    region = request.args.get("region")
+
+    kpis = AnalyticsService.get_summary_kpis(start_date=start_date, end_date=end_date, region=region)
+    monthly_trends = AnalyticsService.get_monthly_growth_trends(start_date=start_date, end_date=end_date, region=region)
+    regional = AnalyticsService.get_regional_performance(start_date=start_date, end_date=end_date, region=region)
+    top_products = AnalyticsService.get_top_products(limit=5, start_date=start_date, end_date=end_date, region=region)
+
+    sales_q = AnalyticsService.apply_sales_filters(
+        Sale.query, start_date=start_date, end_date=end_date, region=region
+    )
+    stats = DataProcessor.compute_summary_statistics(sales_q)
+
+    # 10 recent transactions matching filter
+    recent_txs = [
+        s.to_dict(include_relations=True)
+        for s in sales_q.order_by(Sale.sale_date.desc(), Sale.id.desc()).limit(10).all()
+    ]
+    total_matching = sales_q.count()
+
+    min_date_row, max_date_row = db.session.query(func.min(Sale.sale_date), func.max(Sale.sale_date)).first()
+
+    return jsonify({
+        "success": True,
+        "filters": {
+            "start_date": start_date or "",
+            "end_date": end_date or "",
+            "region": region or ""
+        },
+        "date_bounds": {
+            "min_date": str(min_date_row) if min_date_row else "2025-01-01",
+            "max_date": str(max_date_row) if max_date_row else "2026-12-31"
+        },
+        "kpis": kpis,
+        "monthly_trends": monthly_trends,
+        "regional_performance": regional,
+        "top_products": top_products,
+        "stats": stats,
+        "transactions": {
+            "total_items": total_matching,
+            "items": recent_txs
+        }
+    }), 200
+
