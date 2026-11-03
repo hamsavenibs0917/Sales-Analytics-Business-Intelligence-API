@@ -1,0 +1,12 @@
+transaction_id,customer_code,customer_name,product_sku,product_name,category,quantity,unit_price,unit_cost,discount,sale_date,region,payment_method,status
+TXN-BULK-201,CUST-1001,Acme Corporation,SKU-LAP-01,ThinkPro Laptop,Electronics,4,1199.99,650.0,0.05,2026-08-10,North,Credit Card,Completed
+TXN-BULK-202,CUST-1002,Apex Global,SKU-MON-02,UltraWide Monitor,Electronics,10,449.99,220.0,0.1,2026-08-12,South,Bank Transfer,Completed
+TXN-BULK-203,CUST-1003,Zenith Retail,SKU-SFT-03,BI Cloud License,Software,25,499.0,80.0,0.15,2026-08-15,East,Invoice,Completed
+TXN-BULK-204,CUST-1004,Beacon Health,SKU-SRV-04,Dedicated Server,Electronics,2,2499.0,1200.0,0.0,2026-08-18,West,Credit Card,Completed
+TXN-BULK-205,CUST-1005,Summit Financial,SKU-CHR-05,Ergonomic Chair,Furniture,12,289.5,110.0,0.08,2026-08-20,Central,Bank Transfer,Completed
+TXN-BULK-206,CUST-9999,Quantum Leap AI,SKU-NEW-99,AI Inference Accelerator,Electronics,5,1850.0,900.0,0.0,2026-08-22,West,Invoice,Completed
+TXN-BULK-207,CUST-1006,Horizon Creative,SKU-DSK-06,Adjustable Desk,Furniture,6,599.0,240.0,0.05,2026-08-25,West,Credit Card,Completed
+TXN-BULK-208,CUST-1007,OmniTech,SKU-SEC-07,Cybersecurity Suite,Software,15,299.0,50.0,0.1,2026-08-28,North,Invoice,Completed
+TXN-BULK-209,CUST-1008,Vanguard Media,SKU-ACC-10,USB-C Dock,Electronics,8,119.0,35.0,0.0,2026-08-30,East,PayPal,Completed
+TXN-BULK-210,CUST-1009,Nexus Robotics,SKU-PRN-08,Multi-Function Laser Printer,Office Supplies,3,399.99,180.0,0.0,2026-09-02,International,Bank Transfer,Completed
+TXN-BULK-201,CUST-1001,Acme Corporation,SKU-LAP-01,ThinkPro Laptop,Electronics,4,1199.99,650.0,0.05,2026-08-10,North,Credit Card,Completed

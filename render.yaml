@@ -1,0 +1,32 @@
+databases:
+  - name: sales-analytics-db
+    databaseName: sales_bi
+    user: sales_admin
+    plan: free
+    region: oregon
+
+services:
+  - type: web
+    name: sales-analytics-api
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt && python scripts/seed_db.py"
+    startCommand: "gunicorn --bind 0.0.0.0:$PORT run:app --workers 2 --threads 4 --timeout 120"
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sales-analytics-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: JWT_ACCESS_TOKEN_EXPIRES_MINUTES
+        value: 120
+      - key: JWT_REFRESH_TOKEN_EXPIRES_DAYS
+        value: 30
+      - key: LOG_LEVEL
+        value: INFO
