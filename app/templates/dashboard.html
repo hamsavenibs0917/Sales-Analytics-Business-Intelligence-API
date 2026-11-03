@@ -181,12 +181,60 @@
             <span class="absolute top-2 right-2 w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
           </button>
 
-          <!-- User Profile -->
-          <div class="flex items-center space-x-2.5 pl-1 pr-3 py-1 rounded-2xl border border-slate-200/80 dark:border-slate-700">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="w-7 h-7 rounded-full object-cover">
-            <div class="text-left hidden md:block">
-              <p class="text-xs font-bold text-slate-800 dark:text-white leading-tight">Alex Smith</p>
-              <p class="text-[10px] text-slate-400 font-medium">Business</p>
+          <!-- Dynamic User Profile & Authentication Trigger -->
+          <div class="relative" id="user-profile-wrapper">
+            <!-- Logged-in Profile Button -->
+            <button 
+              id="user-profile-btn" 
+              onclick="toggleUserMenu()" 
+              class="flex items-center space-x-2.5 pl-1.5 pr-3 py-1 rounded-2xl border border-slate-200/80 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer"
+            >
+              <div id="user-avatar-badge" class="w-7 h-7 rounded-full bg-gradient-to-tr from-brand-700 to-indigo-500 text-white font-extrabold text-[11px] flex items-center justify-center shadow-sm uppercase">
+                EA
+              </div>
+              <div class="text-left hidden md:block">
+                <p id="user-display-name" class="text-xs font-bold text-slate-800 dark:text-white leading-tight">Executive Administrator</p>
+                <p id="user-display-role" class="text-[10px] text-brand-600 dark:text-brand-400 font-semibold uppercase tracking-wider">admin</p>
+              </div>
+              <i class="fa-solid fa-chevron-down text-[9px] text-slate-400 hidden sm:inline ml-1"></i>
+            </button>
+
+            <!-- Logged-out Sign In Button -->
+            <button 
+              id="user-signin-btn" 
+              onclick="openLoginModal()" 
+              class="hidden items-center space-x-2 px-3.5 py-1.5 rounded-2xl bg-brand-50 hover:bg-brand-100 text-brand-700 dark:bg-slate-800 dark:text-brand-400 border border-brand-200 dark:border-slate-700 text-xs font-bold transition shadow-sm"
+            >
+              <i class="fa-solid fa-arrow-right-to-bracket text-xs text-brand-600"></i>
+              <span>Sign In</span>
+            </button>
+
+            <!-- User Dropdown Menu -->
+            <div 
+              id="user-profile-menu" 
+              class="hidden absolute right-0 top-12 w-64 bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 p-4 z-40 space-y-3"
+            >
+              <div class="flex items-center space-x-3 pb-3 border-b border-slate-100 dark:border-slate-700">
+                <div id="menu-avatar-badge" class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-700 to-indigo-500 text-white font-extrabold text-xs flex items-center justify-center uppercase shadow-sm">
+                  EA
+                </div>
+                <div class="overflow-hidden">
+                  <p id="menu-user-name" class="text-xs font-bold text-slate-900 dark:text-white truncate">Executive Administrator</p>
+                  <p id="menu-user-email" class="text-[11px] text-slate-400 truncate">admin@company.com</p>
+                  <span id="menu-user-role-badge" class="inline-block mt-1 px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-violet-100 dark:bg-violet-950 text-brand-700 dark:text-violet-300 uppercase">ADMIN</span>
+                </div>
+              </div>
+
+              <div class="space-y-1">
+                <button onclick="openLoginModal(); toggleUserMenu();" class="w-full text-left flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition">
+                  <i class="fa-solid fa-user-gear text-slate-400 w-4"></i>
+                  <span>Switch Account / Sign In</span>
+                </button>
+                <button onclick="handleLogout()" class="w-full text-left flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition">
+                  <i class="fa-solid fa-right-from-bracket text-rose-500 w-4"></i>
+                  <span>Log Out</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -616,6 +664,154 @@
         </div>
       </form>
     </div>
+  <!-- ========================================== -->
+  <!-- MODAL: USER AUTHENTICATION (SIGN IN & REGISTER) -->
+  <!-- ========================================== -->
+  <div id="login-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-5">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-2">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-700 to-indigo-500 flex items-center justify-center text-white shadow-sm">
+            <i class="fa-solid fa-chart-pie text-xs"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">Account Authentication</h3>
+            <p class="text-[11px] text-slate-400">Sign in or register to display your name</p>
+          </div>
+        </div>
+        <button onclick="closeLoginModal()" class="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-600">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Tab Switcher: Sign In vs Register -->
+      <div class="bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl flex text-xs font-bold">
+        <button id="auth-tab-signin" onclick="switchAuthTab('signin')" class="flex-1 py-2 rounded-xl bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm transition">
+          Sign In
+        </button>
+        <button id="auth-tab-register" onclick="switchAuthTab('register')" class="flex-1 py-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
+          Create Account
+        </button>
+      </div>
+
+      <!-- Error / Success Alert Box -->
+      <div id="auth-alert" class="hidden text-xs p-3 rounded-2xl"></div>
+
+      <!-- 1. SIGN IN FORM -->
+      <form id="signin-form" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+        <!-- Quick One-Click Demo Credentials -->
+        <div>
+          <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Quick Demo Logins</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button type="button" onclick="fillDemoCredentials('admin')" class="p-2 text-center rounded-xl border border-indigo-200 bg-indigo-50/60 hover:bg-indigo-100/70 dark:bg-slate-800 text-[11px] font-bold text-brand-700 dark:text-indigo-300 transition">
+              👑 Admin
+            </button>
+            <button type="button" onclick="fillDemoCredentials('analyst')" class="p-2 text-center rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-700 dark:text-slate-200 transition">
+              📊 Analyst
+            </button>
+            <button type="button" onclick="fillDemoCredentials('user')" class="p-2 text-center rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-700 dark:text-slate-200 transition">
+              👤 Viewer
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Email Address</label>
+            <input 
+              type="email" 
+              id="login-email" 
+              required 
+              value="admin@company.com" 
+              placeholder="e.g. yourname@company.com" 
+              class="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+            >
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Password</label>
+            <input 
+              type="password" 
+              id="login-password" 
+              required 
+              value="AdminPass123!" 
+              placeholder="Enter password" 
+              class="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+            >
+          </div>
+        </div>
+
+        <button 
+          type="submit" 
+          id="login-submit-btn" 
+          class="w-full py-2.5 rounded-xl text-xs font-extrabold text-white bg-brand-600 hover:bg-brand-700 shadow-md shadow-brand-500/20 transition flex items-center justify-center space-x-2"
+        >
+          <span>Sign In to Dashboard</span>
+          <i class="fa-solid fa-arrow-right text-[11px]"></i>
+        </button>
+      </form>
+
+      <!-- 2. REGISTER FORM -->
+      <form id="register-form" onsubmit="handleRegisterSubmit(event)" class="space-y-3 hidden">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Your Full Name</label>
+          <input 
+            type="text" 
+            id="reg-fullname" 
+            required 
+            placeholder="e.g. John Doe, Alex Smith" 
+            class="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+          >
+          <p class="text-[10px] text-slate-400 mt-0.5">This name will be displayed in the top dashboard profile.</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Email Address</label>
+          <input 
+            type="email" 
+            id="reg-email" 
+            required 
+            placeholder="e.g. john@company.com" 
+            class="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+          >
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Role</label>
+            <select 
+              id="reg-role" 
+              class="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+            >
+              <option value="admin">Administrator</option>
+              <option value="analyst">BI Analyst</option>
+              <option value="user">Business User</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Password</label>
+            <input 
+              type="password" 
+              id="reg-password" 
+              required 
+              minlength="8" 
+              placeholder="Min 8 characters" 
+              class="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+            >
+          </div>
+        </div>
+
+        <button 
+          type="submit" 
+          id="reg-submit-btn" 
+          class="w-full py-2.5 rounded-xl text-xs font-extrabold text-white bg-brand-600 hover:bg-brand-700 shadow-md shadow-brand-500/20 transition flex items-center justify-center space-x-2 mt-2"
+        >
+          <span>Create Account & Log In</span>
+          <i class="fa-solid fa-check text-[11px]"></i>
+        </button>
+      </form>
+    </div>
   </div>
 
   <!-- ========================================== -->
@@ -623,9 +819,227 @@
   <!-- ========================================== -->
   <script>
     let authToken = localStorage.getItem("access_token") || null;
+    let currentUser = null;
+    try {
+      currentUser = JSON.parse(localStorage.getItem("user_info") || "null");
+    } catch (e) {
+      currentUser = null;
+    }
     let splineChart = null;
     let donutChart = null;
     let overviewCache = null;
+
+    // Helper: Compute User Initials (e.g. "John Doe" -> "JD", "Alex" -> "A")
+    function getUserInitials(name) {
+      if (!name) return "US";
+      const parts = name.trim().split(/\s+/);
+      if (parts.length >= 2) {
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      }
+      return name.substring(0, 2).toUpperCase();
+    }
+
+    // Helper: Update User Profile in UI with currently logged in user's real name
+    function updateUserUI(user) {
+      currentUser = user;
+      const profileBtn = document.getElementById("user-profile-btn");
+      const signinBtn = document.getElementById("user-signin-btn");
+      const displayName = document.getElementById("user-display-name");
+      const displayRole = document.getElementById("user-display-role");
+      const avatarBadge = document.getElementById("user-avatar-badge");
+      const menuAvatarBadge = document.getElementById("menu-avatar-badge");
+      const menuUserName = document.getElementById("menu-user-name");
+      const menuUserEmail = document.getElementById("menu-user-email");
+      const menuUserRole = document.getElementById("menu-user-role-badge");
+
+      if (user && user.full_name) {
+        const initials = getUserInitials(user.full_name);
+        if (avatarBadge) avatarBadge.innerText = initials;
+        if (menuAvatarBadge) menuAvatarBadge.innerText = initials;
+        if (displayName) displayName.innerText = user.full_name;
+        if (displayRole) displayRole.innerText = user.role || 'user';
+        if (menuUserName) menuUserName.innerText = user.full_name;
+        if (menuUserEmail) menuUserEmail.innerText = user.email || '';
+        if (menuUserRole) menuUserRole.innerText = (user.role || 'USER').toUpperCase();
+
+        if (profileBtn) profileBtn.classList.remove("hidden");
+        if (signinBtn) signinBtn.classList.add("hidden");
+      } else {
+        if (profileBtn) profileBtn.classList.add("hidden");
+        if (signinBtn) {
+          signinBtn.classList.remove("hidden");
+          signinBtn.classList.add("inline-flex");
+        }
+        const menu = document.getElementById("user-profile-menu");
+        if (menu) menu.classList.add("hidden");
+      }
+    }
+
+    // Modal & Menu Controls
+    function toggleUserMenu() {
+      const menu = document.getElementById("user-profile-menu");
+      if (menu) menu.classList.toggle("hidden");
+    }
+
+    function openLoginModal(tab = 'signin') {
+      document.getElementById("login-modal").classList.remove("hidden");
+      switchAuthTab(tab);
+      clearAuthAlert();
+    }
+
+    function closeLoginModal() {
+      document.getElementById("login-modal").classList.add("hidden");
+      clearAuthAlert();
+    }
+
+    function switchAuthTab(tab) {
+      const sTab = document.getElementById("auth-tab-signin");
+      const rTab = document.getElementById("auth-tab-register");
+      const sForm = document.getElementById("signin-form");
+      const rForm = document.getElementById("register-form");
+
+      if (tab === 'signin') {
+        sTab.className = "flex-1 py-2 rounded-xl bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm transition";
+        rTab.className = "flex-1 py-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition";
+        sForm.classList.remove("hidden");
+        rForm.classList.add("hidden");
+      } else {
+        rTab.className = "flex-1 py-2 rounded-xl bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm transition";
+        sTab.className = "flex-1 py-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition";
+        rForm.classList.remove("hidden");
+        sForm.classList.add("hidden");
+      }
+      clearAuthAlert();
+    }
+
+    function showAuthAlert(msg, type = 'error') {
+      const box = document.getElementById("auth-alert");
+      box.classList.remove("hidden");
+      if (type === 'success') {
+        box.className = "text-xs p-3 rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-200 block";
+      } else {
+        box.className = "text-xs p-3 rounded-2xl bg-rose-50 text-rose-800 border border-rose-200 block";
+      }
+      box.innerHTML = msg;
+    }
+
+    function clearAuthAlert() {
+      const box = document.getElementById("auth-alert");
+      if (box) {
+        box.classList.add("hidden");
+        box.innerHTML = "";
+      }
+    }
+
+    function fillDemoCredentials(role) {
+      if (role === 'admin') {
+        document.getElementById("login-email").value = "admin@company.com";
+        document.getElementById("login-password").value = "AdminPass123!";
+      } else if (role === 'analyst') {
+        document.getElementById("login-email").value = "analyst@company.com";
+        document.getElementById("login-password").value = "AnalystPass123!";
+      } else {
+        document.getElementById("login-email").value = "user@company.com";
+        document.getElementById("login-password").value = "UserPass123!";
+      }
+    }
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value;
+      const btn = document.getElementById("login-submit-btn");
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Authenticating...`;
+
+      try {
+        const res = await fetch("/api/v1/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.message || (data.error && data.error.message) || "Invalid email or password");
+        }
+
+        authToken = data.access_token;
+        currentUser = data.user;
+        localStorage.setItem("access_token", authToken);
+        localStorage.setItem("user_info", JSON.stringify(currentUser));
+
+        updateUserUI(currentUser);
+        showAuthAlert(`Welcome, <strong>${currentUser.full_name}</strong>!`, "success");
+        setTimeout(() => {
+          closeLoginModal();
+        }, 900);
+      } catch (err) {
+        showAuthAlert(err.message, "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>Sign In to Dashboard</span> <i class="fa-solid fa-arrow-right text-[11px] ml-1"></i>`;
+      }
+    }
+
+    async function handleRegisterSubmit(e) {
+      e.preventDefault();
+      const fullName = document.getElementById("reg-fullname").value.trim();
+      const email = document.getElementById("reg-email").value.trim();
+      const role = document.getElementById("reg-role").value;
+      const password = document.getElementById("reg-password").value;
+      const btn = document.getElementById("reg-submit-btn");
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Creating Account...`;
+
+      try {
+        const res = await fetch("/api/v1/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ full_name: fullName, email, password, role })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.message || (data.error && data.error.message) || "Registration failed");
+        }
+
+        // Automatically log in with new credentials
+        const loginRes = await fetch("/api/v1/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+        const loginData = await loginRes.json();
+        if (loginRes.ok) {
+          authToken = loginData.access_token;
+          currentUser = loginData.user;
+          localStorage.setItem("access_token", authToken);
+          localStorage.setItem("user_info", JSON.stringify(currentUser));
+          updateUserUI(currentUser);
+          showAuthAlert(`Account created! Welcome, <strong>${currentUser.full_name}</strong>!`, "success");
+          setTimeout(() => {
+            closeLoginModal();
+          }, 1200);
+        }
+      } catch (err) {
+        showAuthAlert(err.message, "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>Create Account & Log In</span> <i class="fa-solid fa-check text-[11px] ml-1"></i>`;
+      }
+    }
+
+    function handleLogout() {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("user_info");
+      authToken = null;
+      currentUser = null;
+      updateUserUI(null);
+      const menu = document.getElementById("user-profile-menu");
+      if (menu) menu.classList.add("hidden");
+      openLoginModal('signin');
+    }
 
     // Brand product icon mapping helper
     function getProductIcon(name, category) {
@@ -639,8 +1053,32 @@
       return 'fa-box';
     }
 
-    // 1. Silent JWT Authentication
+    // Silent or Local Authentication sync
     async function ensureAuth() {
+      // 1. If user already in localStorage, display immediately
+      if (currentUser && currentUser.full_name) {
+        updateUserUI(currentUser);
+      }
+
+      // 2. Validate or fetch current user profile from server
+      if (authToken) {
+        try {
+          const meRes = await fetch("/api/v1/auth/me", {
+            headers: { "Authorization": `Bearer ${authToken}` }
+          });
+          if (meRes.ok) {
+            const meData = await meRes.json();
+            currentUser = meData.user;
+            localStorage.setItem("user_info", JSON.stringify(currentUser));
+            updateUserUI(currentUser);
+            return;
+          }
+        } catch (e) {
+          // Fall through to default login
+        }
+      }
+
+      // 3. Fallback: Authenticate as default admin if no user logged in
       try {
         let res = await fetch("/api/v1/auth/login", {
           method: "POST",
@@ -658,7 +1096,10 @@
         if (res.ok) {
           const data = await res.json();
           authToken = data.access_token;
+          currentUser = data.user;
           localStorage.setItem("access_token", authToken);
+          localStorage.setItem("user_info", JSON.stringify(currentUser));
+          updateUserUI(currentUser);
         }
       } catch (e) {
         console.warn("Auth check failed:", e);
@@ -1143,6 +1584,12 @@
       const expDropdown = document.getElementById("export-dropdown");
       if (expDropdown && !expDropdown.classList.contains("hidden") && !expDropdown.contains(e.target) && !expBtn.contains(e.target)) {
         expDropdown.classList.add("hidden");
+      }
+
+      const uBtn = document.getElementById("user-profile-btn");
+      const uMenu = document.getElementById("user-profile-menu");
+      if (uMenu && !uMenu.classList.contains("hidden") && !uMenu.contains(e.target) && !uBtn.contains(e.target)) {
+        uMenu.classList.add("hidden");
       }
     });
 
