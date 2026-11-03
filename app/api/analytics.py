@@ -29,16 +29,17 @@ def get_executive_summary():
 def get_top_products():
     """
     Get top-selling products ranked by revenue, units_sold, or profit.
-    Query params: limit (default 10), order_by (revenue|units_sold|profit|orders), start_date, end_date, category
+    Query params: limit (default 10), order_by (revenue|units_sold|profit|orders), start_date, end_date, region, category
     """
     limit = int(request.args.get("limit", 10))
     order_by = request.args.get("order_by", "revenue")
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
+    region = request.args.get("region")
     category = request.args.get("category")
 
     results = AnalyticsService.get_top_products(
-        limit=limit, order_by=order_by, start_date=start_date, end_date=end_date, category=category
+        limit=limit, order_by=order_by, start_date=start_date, end_date=end_date, region=region, category=category
     )
     return jsonify({
         "success": True,
@@ -53,8 +54,9 @@ def get_category_performance():
     """Get sales and margin breakdown by product category."""
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
+    region = request.args.get("region")
 
-    results = AnalyticsService.get_category_performance(start_date=start_date, end_date=end_date)
+    results = AnalyticsService.get_category_performance(start_date=start_date, end_date=end_date, region=region)
     return jsonify({
         "success": True,
         "data": results
@@ -67,8 +69,9 @@ def get_regional_breakdown():
     """Get sales, profit, and revenue contribution percentages by sales region."""
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
+    region = request.args.get("region")
 
-    results = AnalyticsService.get_regional_performance(start_date=start_date, end_date=end_date)
+    results = AnalyticsService.get_regional_performance(start_date=start_date, end_date=end_date, region=region)
     return jsonify({
         "success": True,
         "data": results
@@ -81,8 +84,9 @@ def get_monthly_growth_trends():
     """Get chronological monthly sales trends with Month-over-Month (MoM) % growth."""
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
+    region = request.args.get("region")
 
-    results = AnalyticsService.get_monthly_growth_trends(start_date=start_date, end_date=end_date)
+    results = AnalyticsService.get_monthly_growth_trends(start_date=start_date, end_date=end_date, region=region)
     return jsonify({
         "success": True,
         "data": results
@@ -107,8 +111,9 @@ def get_top_customers():
     limit = int(request.args.get("limit", 10))
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
+    region = request.args.get("region")
 
-    results = AnalyticsService.get_top_customers(limit=limit, start_date=start_date, end_date=end_date)
+    results = AnalyticsService.get_top_customers(limit=limit, start_date=start_date, end_date=end_date, region=region)
     return jsonify({
         "success": True,
         "count": len(results),

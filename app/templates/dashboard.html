@@ -45,13 +45,17 @@
         </div>
       </div>
 
-      <div class="flex items-center space-x-3">
+      <div class="flex items-center space-x-2 sm:space-x-3">
         <span id="api-status" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
-          <span class="w-2 h-2 mr-1.5 rounded-full bg-emerald-500 animate-pulse"></span> API Connected
+          <span class="w-2 h-2 mr-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Connected
         </span>
 
+        <button id="seed-btn" onclick="triggerManualSeed()" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition border border-indigo-200">
+          <i class="fa-solid fa-database mr-1.5 text-indigo-600"></i> Seed 200+ Demo Records
+        </button>
+
         <a href="/api/v1/docs" target="_blank" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
-          <i class="fa-solid fa-book-open mr-1.5"></i> Swagger API Docs
+          <i class="fa-solid fa-book-open mr-1.5"></i> Swagger Docs
         </a>
 
         <button onclick="openUploadModal()" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-sm transition">
@@ -62,18 +66,19 @@
   </header>
 
   <!-- Main Container -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
     <!-- Filters & Action Bar -->
     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
       <div class="flex flex-wrap items-center gap-3">
         <div>
-          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Date Range</label>
-          <div class="flex items-center space-x-2">
-            <input type="date" id="start-date" class="border border-slate-300 rounded-lg text-xs px-2.5 py-1.5 focus:ring-2 focus:ring-brand-500 focus:outline-none">
-            <span class="text-slate-400 text-xs">to</span>
-            <input type="date" id="end-date" class="border border-slate-300 rounded-lg text-xs px-2.5 py-1.5 focus:ring-2 focus:ring-brand-500 focus:outline-none">
-          </div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Start Date</label>
+          <input type="date" id="start-date" class="border border-slate-300 rounded-lg text-xs px-2.5 py-1.5 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">End Date</label>
+          <input type="date" id="end-date" class="border border-slate-300 rounded-lg text-xs px-2.5 py-1.5 focus:ring-2 focus:ring-brand-500 focus:outline-none">
         </div>
 
         <div>
@@ -89,11 +94,11 @@
           </select>
         </div>
 
-        <div class="pt-5">
-          <button onclick="loadDashboardData()" class="px-3.5 py-1.5 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition shadow-sm">
+        <div class="pt-5 flex items-center space-x-2">
+          <button onclick="applyFilters()" class="px-4 py-1.5 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition shadow-sm">
             <i class="fa-solid fa-filter mr-1"></i> Apply Filters
           </button>
-          <button onclick="resetFilters()" class="px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 transition">
+          <button onclick="resetFilters()" class="px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 transition bg-slate-100 rounded-lg">
             Reset
           </button>
         </div>
@@ -110,6 +115,15 @@
       </div>
     </div>
 
+    <!-- Active Filters Notification Banner -->
+    <div id="filter-banner" class="bg-indigo-50 border border-indigo-200 text-indigo-900 px-4 py-2 rounded-xl text-xs flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <i class="fa-solid fa-circle-info text-indigo-600"></i>
+        <span id="filter-summary-text">Displaying all-time sales records across all territories.</span>
+      </div>
+      <button onclick="resetFilters()" class="text-indigo-700 underline font-semibold hover:text-indigo-900">Clear</button>
+    </div>
+
     <!-- KPI Metric Cards Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
       <!-- Total Revenue -->
@@ -121,7 +135,7 @@
           </span>
         </div>
         <div id="kpi-revenue" class="text-xl font-bold text-slate-900">$0.00</div>
-        <span class="text-xs text-emerald-600 font-semibold"><i class="fa-solid fa-arrow-trend-up mr-1"></i>Total Sales Volume</span>
+        <span class="text-[11px] text-emerald-600 font-semibold"><i class="fa-solid fa-arrow-trend-up mr-1"></i>Total Revenue</span>
       </div>
 
       <!-- Net Profit -->
@@ -133,7 +147,7 @@
           </span>
         </div>
         <div id="kpi-profit" class="text-xl font-bold text-slate-900">$0.00</div>
-        <span class="text-xs text-indigo-600 font-semibold">After COGS Deductions</span>
+        <span class="text-[11px] text-indigo-600 font-semibold">After Unit Costs</span>
       </div>
 
       <!-- Profit Margin % -->
@@ -145,7 +159,7 @@
           </span>
         </div>
         <div id="kpi-margin" class="text-xl font-bold text-slate-900">0.0%</div>
-        <span class="text-xs text-purple-600 font-semibold">Profitability Ratio</span>
+        <span class="text-[11px] text-purple-600 font-semibold">Profitability Ratio</span>
       </div>
 
       <!-- Total Units Sold -->
@@ -157,7 +171,7 @@
           </span>
         </div>
         <div id="kpi-units" class="text-xl font-bold text-slate-900">0</div>
-        <span class="text-xs text-amber-600 font-semibold">Items Shipped</span>
+        <span class="text-[11px] text-amber-600 font-semibold">Total Quantity</span>
       </div>
 
       <!-- Total Transactions -->
@@ -169,7 +183,7 @@
           </span>
         </div>
         <div id="kpi-orders" class="text-xl font-bold text-slate-900">0</div>
-        <span class="text-xs text-sky-600 font-semibold">Transactions</span>
+        <span class="text-[11px] text-sky-600 font-semibold">Transactions</span>
       </div>
 
       <!-- Average Order Value (AOV) -->
@@ -181,7 +195,7 @@
           </span>
         </div>
         <div id="kpi-aov" class="text-xl font-bold text-slate-900">$0.00</div>
-        <span class="text-xs text-rose-600 font-semibold">Avg Basket Size</span>
+        <span class="text-[11px] text-rose-600 font-semibold">Avg Basket Size</span>
       </div>
     </div>
 
@@ -192,7 +206,7 @@
         <div class="flex items-center justify-between mb-4">
           <div>
             <h2 class="text-sm font-bold text-slate-900">Monthly Revenue & Profit Trajectory</h2>
-            <p class="text-xs text-slate-500">Month-over-Month (MoM) performance calculated via Pandas</p>
+            <p class="text-xs text-slate-500">Month-over-Month (MoM) growth calculated with Pandas</p>
           </div>
           <span class="text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md font-medium">Time-Series</span>
         </div>
@@ -222,7 +236,7 @@
         <div class="flex items-center justify-between mb-4">
           <div>
             <h2 class="text-sm font-bold text-slate-900">Top-Selling Products</h2>
-            <p class="text-xs text-slate-500">Ranked by gross sales volume and profit margin</p>
+            <p class="text-xs text-slate-500">Ranked by gross sales volume and profit</p>
           </div>
         </div>
         <div class="h-64">
@@ -232,16 +246,16 @@
 
       <!-- Statistical Distribution Card (NumPy Powered) -->
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-        <h2 class="text-sm font-bold text-slate-900 mb-1">NumPy Statistical Insights</h2>
+        <h2 class="text-sm font-bold text-slate-900 mb-1">NumPy Statistical Summary</h2>
         <p class="text-xs text-slate-500 mb-4">Transaction size distribution metrics</p>
         
         <div class="space-y-3">
           <div class="flex justify-between items-center text-xs py-1.5 border-b border-slate-100">
-            <span class="text-slate-600">Mean Transaction:</span>
+            <span class="text-slate-600">Mean Order Amount:</span>
             <span id="stat-mean" class="font-bold text-slate-900">$0.00</span>
           </div>
           <div class="flex justify-between items-center text-xs py-1.5 border-b border-slate-100">
-            <span class="text-slate-600">Median Transaction:</span>
+            <span class="text-slate-600">Median Order Amount:</span>
             <span id="stat-median" class="font-bold text-slate-900">$0.00</span>
           </div>
           <div class="flex justify-between items-center text-xs py-1.5 border-b border-slate-100">
@@ -335,28 +349,65 @@
     let regionalChart = null;
     let productsChart = null;
 
-    // 1. Authenticate with backend API automatically
+    // 1. Authenticate with backend API automatically (with auto-seed fallback)
     async function ensureAuth() {
-      if (!authToken) {
-        try {
-          const res = await fetch("/api/v1/auth/login", {
+      try {
+        let res = await fetch("/api/v1/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: "admin@company.com", password: "AdminPass123!" })
+        });
+        
+        // If login failed (e.g. fresh database without seeded admin)
+        if (!res.ok) {
+          console.log("Admin account not found. Seeding initial database...");
+          await fetch("/api/v1/seed", { method: "POST" });
+          res = await fetch("/api/v1/auth/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: "admin@company.com", password: "AdminPass123!" })
           });
-          if (res.ok) {
-            const data = await res.json();
-            authToken = data.access_token;
-            localStorage.setItem("access_token", authToken);
-          }
-        } catch (e) {
-          console.warn("Could not auto-login:", e);
         }
+
+        if (res.ok) {
+          const data = await res.json();
+          authToken = data.access_token;
+          localStorage.setItem("access_token", authToken);
+          document.getElementById("api-status").className = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800";
+          document.getElementById("api-status").innerHTML = `<span class="w-2 h-2 mr-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Connected`;
+        }
+      } catch (e) {
+        console.warn("Auth check failed:", e);
       }
     }
 
     function authHeaders() {
       return authToken ? { "Authorization": `Bearer ${authToken}` } : {};
+    }
+
+    // Manual Seed Trigger
+    async function triggerManualSeed() {
+      const btn = document.getElementById("seed-btn");
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Seeding...`;
+      }
+      try {
+        const res = await fetch("/api/v1/seed", { method: "POST" });
+        const json = await res.json();
+        localStorage.removeItem("access_token");
+        authToken = null;
+        await ensureAuth();
+        await loadDashboardData();
+        alert("Success! 200+ historical multi-year records and default accounts seeded.");
+      } catch (err) {
+        alert("Seed failed: " + err.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-database mr-1.5 text-indigo-600"></i> Seed 200+ Demo Records`;
+        }
+      }
     }
 
     // 2. Fetch and render KPIs
@@ -376,14 +427,34 @@
         document.getElementById("kpi-units").innerText = d.total_units_sold.toLocaleString();
         document.getElementById("kpi-orders").innerText = d.total_orders.toLocaleString();
         document.getElementById("kpi-aov").innerText = `$${d.average_order_value.toFixed(2)}`;
+
+        // If revenue is 0 on all-time initial load, trigger auto-seed once
+        if (d.total_revenue === 0 && !startDate && !endDate && !region) {
+          console.log("Empty dataset detected on initial view. Auto-populating...");
+          await fetch("/api/v1/seed", { method: "POST" });
+          await ensureAuth();
+          // Reload once
+          const retryRes = await fetch(url, { headers: authHeaders() });
+          if (retryRes.ok) {
+            const retryJson = await retryRes.json();
+            const rd = retryJson.data;
+            document.getElementById("kpi-revenue").innerText = `$${rd.total_revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+            document.getElementById("kpi-profit").innerText = `$${rd.total_profit.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+            document.getElementById("kpi-margin").innerText = `${rd.gross_profit_margin_percent.toFixed(1)}%`;
+            document.getElementById("kpi-units").innerText = rd.total_units_sold.toLocaleString();
+            document.getElementById("kpi-orders").innerText = rd.total_orders.toLocaleString();
+            document.getElementById("kpi-aov").innerText = `$${rd.average_order_value.toFixed(2)}`;
+          }
+        }
       }
     }
 
     // 3. Monthly Trends Chart (MoM %)
-    async function loadMonthlyTrends(startDate, endDate) {
+    async function loadMonthlyTrends(startDate, endDate, region) {
       let url = `/api/v1/analytics/trends/monthly?`;
       if (startDate) url += `start_date=${startDate}&`;
       if (endDate) url += `end_date=${endDate}&`;
+      if (region) url += `region=${encodeURIComponent(region)}&`;
 
       const res = await fetch(url, { headers: authHeaders() });
       if (!res.ok) return;
@@ -439,10 +510,11 @@
     }
 
     // 4. Regional Share Donut Chart
-    async function loadRegionalShare(startDate, endDate) {
+    async function loadRegionalShare(startDate, endDate, region) {
       let url = `/api/v1/analytics/regions?`;
       if (startDate) url += `start_date=${startDate}&`;
       if (endDate) url += `end_date=${endDate}&`;
+      if (region) url += `region=${encodeURIComponent(region)}&`;
 
       const res = await fetch(url, { headers: authHeaders() });
       if (!res.ok) return;
@@ -480,10 +552,11 @@
     }
 
     // 5. Top Products Chart
-    async function loadTopProducts(startDate, endDate) {
+    async function loadTopProducts(startDate, endDate, region) {
       let url = `/api/v1/analytics/products/top?limit=5&`;
       if (startDate) url += `start_date=${startDate}&`;
       if (endDate) url += `end_date=${endDate}&`;
+      if (region) url += `region=${encodeURIComponent(region)}&`;
 
       const res = await fetch(url, { headers: authHeaders() });
       if (!res.ok) return;
@@ -558,7 +631,7 @@
 
       const tbody = document.getElementById("sales-table-body");
       if (sales.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-6 text-center text-slate-400">No records found matching filters.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-6 text-center text-slate-400">No transactions found matching the selected filters.</td></tr>`;
         return;
       }
 
@@ -581,21 +654,39 @@
       `).join('');
     }
 
-    // Master loader
+    // Master loader with filter state management
     async function loadDashboardData() {
       const startDate = document.getElementById("start-date").value;
       const endDate = document.getElementById("end-date").value;
       const region = document.getElementById("region-filter").value;
 
+      // Update Filter Banner text
+      const bannerText = document.getElementById("filter-summary-text");
+      const activeFilters = [];
+      if (region) activeFilters.push(`Region: <strong>${region}</strong>`);
+      if (startDate && endDate) activeFilters.push(`Between <strong>${startDate}</strong> and <strong>${endDate}</strong>`);
+      else if (startDate) activeFilters.push(`From <strong>${startDate}</strong> onwards`);
+      else if (endDate) activeFilters.push(`Up to <strong>${endDate}</strong>`);
+
+      if (activeFilters.length > 0) {
+        bannerText.innerHTML = `Active Filters applied: ${activeFilters.join(" &bull; ")}`;
+      } else {
+        bannerText.innerHTML = `Displaying all-time historical sales data across all regions.`;
+      }
+
       await ensureAuth();
       await Promise.all([
         loadKPIs(startDate, endDate, region),
-        loadMonthlyTrends(startDate, endDate),
-        loadRegionalShare(startDate, endDate),
-        loadTopProducts(startDate, endDate),
+        loadMonthlyTrends(startDate, endDate, region),
+        loadRegionalShare(startDate, endDate, region),
+        loadTopProducts(startDate, endDate, region),
         loadNumPyStats(startDate, endDate, region),
         loadTransactions(startDate, endDate, region),
       ]);
+    }
+
+    function applyFilters() {
+      loadDashboardData();
     }
 
     function resetFilters() {
@@ -616,7 +707,6 @@
       if (endDate) url += `end_date=${endDate}&`;
       if (region) url += `region=${encodeURIComponent(region)}&`;
 
-      // Trigger download with auth header using fetch blob
       fetch(url, { headers: authHeaders() })
         .then(res => res.blob())
         .then(blob => {

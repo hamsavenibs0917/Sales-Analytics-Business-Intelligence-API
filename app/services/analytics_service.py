@@ -70,7 +70,7 @@ class AnalyticsService:
         }
 
     @classmethod
-    def get_top_products(cls, limit=10, order_by="revenue", start_date=None, end_date=None, category=None) -> list:
+    def get_top_products(cls, limit=10, order_by="revenue", start_date=None, end_date=None, region=None, category=None) -> list:
         """
         Find top products ordered by revenue, units_sold, or profit.
         """
@@ -85,7 +85,7 @@ class AnalyticsService:
             func.count(Sale.id).label("order_count")
         ).join(Sale, Sale.product_id == Product.id)
 
-        query = cls.apply_sales_filters(query, start_date=start_date, end_date=end_date)
+        query = cls.apply_sales_filters(query, start_date=start_date, end_date=end_date, region=region)
 
         if category:
             query = query.filter(func.lower(Product.category) == category.lower())
@@ -120,7 +120,7 @@ class AnalyticsService:
         return results
 
     @classmethod
-    def get_regional_performance(cls, start_date=None, end_date=None) -> list:
+    def get_regional_performance(cls, start_date=None, end_date=None, region=None) -> list:
         """
         Sales and profit breakdown by geographical sales region.
         """
@@ -131,7 +131,7 @@ class AnalyticsService:
             func.coalesce(func.sum(Sale.quantity), 0).label("units_sold"),
             func.count(Sale.id).label("order_count"),
         )
-        query = cls.apply_sales_filters(query, start_date=start_date, end_date=end_date)
+        query = cls.apply_sales_filters(query, start_date=start_date, end_date=end_date, region=region)
         rows = query.group_by(Sale.region).order_by(desc("revenue")).all()
 
         total_global_rev = sum(float(r.revenue) for r in rows)
@@ -154,7 +154,7 @@ class AnalyticsService:
         return results
 
     @classmethod
-    def get_monthly_growth_trends(cls, start_date=None, end_date=None) -> list:
+    def get_monthly_growth_trends(cls, start_date=None, end_date=None, region=None) -> list:
         """
         Calculates monthly sales trajectory and Month-over-Month (MoM) growth rates via Pandas.
         """
@@ -167,7 +167,7 @@ class AnalyticsService:
             func.coalesce(func.sum(Sale.quantity), 0).label("units_sold"),
             func.count(Sale.id).label("order_count")
         )
-        query = cls.apply_sales_filters(query, start_date=start_date, end_date=end_date)
+        query = cls.apply_sales_filters(query, start_date=start_date, end_date=end_date, region=region)
         rows = query.group_by("sale_year", "sale_month").order_by(asc("sale_year"), asc("sale_month")).all()
 
         if not rows:
@@ -239,7 +239,7 @@ class AnalyticsService:
         return df.to_dict(orient="records")
 
     @classmethod
-    def get_top_customers(cls, limit=10, start_date=None, end_date=None) -> list:
+    def get_top_customers(cls, limit=10, start_date=None, end_date=None, region=None) -> list:
         """
         Analyzes highest-value customer accounts and transaction frequencies.
         """
@@ -256,7 +256,7 @@ class AnalyticsService:
             func.max(Sale.sale_date).label("last_purchase_date")
         ).join(Sale, Sale.customer_id == Customer.id)
 
-        query = cls.apply_sales_filters(query, start_date=start_date, end_date=end_date)
+        query = cls.apply_sales_filters(query, start_date=start_date, end_date=end_date, region=region)
         rows = query.group_by(
             Customer.id, Customer.customer_code, Customer.name, Customer.region, Customer.segment
         ).order_by(desc("total_spend")).limit(limit).all()
@@ -282,7 +282,7 @@ class AnalyticsService:
         return results
 
     @classmethod
-    def get_category_performance(cls, start_date=None, end_date=None) -> list:
+    def get_category_performance(cls, start_date=None, end_date=None, region=None) -> list:
         """
         Analyzes sales performance aggregated by product category.
         """
@@ -294,7 +294,7 @@ class AnalyticsService:
             func.count(Sale.id).label("order_count")
         ).join(Sale, Sale.product_id == Product.id)
 
-        query = cls.apply_sales_filters(query, start_date=start_date, end_date=end_date)
+        query = cls.apply_sales_filters(query, start_date=start_date, end_date=end_date, region=region)
         rows = query.group_by(Product.category).order_by(desc("revenue")).all()
 
         total_rev = sum(float(r.revenue) for r in rows)

@@ -75,6 +75,22 @@ def create_app(config_name=None):
             "database": "connected"
         }), 200
 
+    @app.route("/api/v1/seed", methods=["GET", "POST"])
+    def trigger_seed():
+        """Public endpoint to seed or restore database with demo dataset."""
+        from scripts.seed_db import seed_database
+        try:
+            seed_database(app)
+            return jsonify({
+                "success": True,
+                "message": "Database successfully populated with default users, catalog, and historical sales transactions."
+            }), 200
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "error": str(e)
+            }), 500
+
     @app.route("/api/v1/openapi.json", methods=["GET"])
     def openapi_spec():
         """Serve the OpenAPI 3.0 specification."""
